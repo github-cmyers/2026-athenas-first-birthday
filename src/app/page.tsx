@@ -6,11 +6,12 @@ import CeremonyDetails from "./components/CeremonyDetails";
 import AboutTheName from "./components/AboutTheName";
 import ImageGallery from "./components/ImageGallery";
 import RSVPForm from "./components/RSVPForm";
+import RSVPClosed from "./components/RSVPClosed";
 import ContactSection from "./components/ContactSection";
 import Footer from "./components/Footer";
 import AnimatedSection from "./components/AnimatedSection";
 import Promo from "./components/Promo";
-import { ceremonyDate } from "@/lib/event";
+import { ceremonyDate, RSVP_OPEN } from "@/lib/event";
 
 export default function Home() {
   return (
@@ -62,7 +63,7 @@ export default function Home() {
           <h2 className="text-3xl font-bold text-center text-rose-700 mb-6">
             RSVP 💌
           </h2>
-          <RSVPForm />
+          {RSVP_OPEN ? <RSVPForm /> : <RSVPClosed />}
         </section>
       </AnimatedSection>
 

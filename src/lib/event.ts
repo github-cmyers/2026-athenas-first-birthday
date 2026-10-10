@@ -8,6 +8,11 @@ export const ceremonyDate = new Date("2026-10-10T16:00:00-04:00");
 
 export const CEREMONY_DURATION_HOURS = 3;
 
+// Whether guests can still submit an RSVP. When false the home page shows a
+// "closed" notice in place of the form; the form component and the RSVP API
+// are left intact so flipping this back is all it takes to reopen.
+export const RSVP_OPEN = false;
+
 // Guests are told the time where the ceremony is, not the time where they are.
 // Pinning the zone also keeps server and client rendering identical, which
 // would otherwise be a hydration mismatch.
