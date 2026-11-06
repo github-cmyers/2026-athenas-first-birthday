@@ -1,8 +1,8 @@
 import Hero from "./components/Hero";
 import GuestCount from "./components/GuestCount";
-import AboutNamingCeremony from "./components/AboutNamingCeremony";
+import AboutTheParty from "./components/AboutTheParty";
 import CountdownTimer from "./components/CountdownTimer";
-import CeremonyDetails from "./components/CeremonyDetails";
+import PartyDetails from "./components/PartyDetails";
 import AboutTheName from "./components/AboutTheName";
 import ImageGallery from "./components/ImageGallery";
 import RSVPForm from "./components/RSVPForm";
@@ -11,34 +11,41 @@ import ContactSection from "./components/ContactSection";
 import Footer from "./components/Footer";
 import AnimatedSection from "./components/AnimatedSection";
 import Promo from "./components/Promo";
-import { ceremonyDate, RSVP_OPEN } from "@/lib/event";
+import { SectionHeading, Wave } from "./components/decor";
+import { HOST, partyDate, RSVP_OPEN } from "@/lib/event";
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-pink-100 via-rose-100 to-pink-50">
+    // overflow-x-clip keeps the tilted cards and offset shadows from ever
+    // causing a sideways scroll on narrow phones.
+    <div className="sprinkles min-h-screen overflow-x-clip">
       <Hero />
 
       <AnimatedSection animation="fade-up" delay={0}>
-        <AboutNamingCeremony />
+        <AboutTheParty />
       </AnimatedSection>
 
-      <AnimatedSection animation="fade-up" delay={100}>
-        <section className="max-w-2xl mx-auto px-4 mb-12">
-          <h2 className="text-2xl font-bold text-center text-rose-700 mb-4">
-            The Event Begins In:
-          </h2>
-          <CountdownTimer targetDate={ceremonyDate} />
+      {/* Countdown on a dark band to break up the run of cards */}
+      <AnimatedSection animation="zoom" delay={0}>
+        <section className="mb-20 text-ink">
+          <Wave />
+          <div className="bg-ink px-4 py-12 md:py-16">
+            <SectionHeading eyebrow="Get ready" title="The party starts in" chip="sunny" squiggle="sunny" light />
+            <CountdownTimer targetDate={partyDate} />
+          </div>
+          <Wave flip />
         </section>
       </AnimatedSection>
 
-      <AnimatedSection animation="fade-left" delay={0}>
-        <CeremonyDetails
+      <AnimatedSection animation="fade-up" delay={0}>
+        {/* TODO: confirm the party venue - this is still the naming ceremony's. */}
+        <PartyDetails
           address="Jacky's Galaxie and Sushi Bar, 1488 Mineral Spring Ave, North Providence, RI 02904"
-          startDate={ceremonyDate}
+          startDate={partyDate}
         />
       </AnimatedSection>
 
-      <AnimatedSection animation="fade-right" delay={0}>
+      <AnimatedSection animation="fade-up" delay={0}>
         <AboutTheName
           name="Athena"
           origin="Greek"
@@ -48,29 +55,32 @@ export default function Home() {
       </AnimatedSection>
 
       <AnimatedSection animation="zoom" delay={0}>
-        <section className="max-w-4xl mx-auto px-4 mb-12">
-          <h2 className="text-3xl font-bold text-center text-rose-700 mb-6">
-            Gallery 📸
-          </h2>
+        <section className="mx-auto mb-20 max-w-4xl px-4">
+          <SectionHeading eyebrow="Snapshots" title="Sweet moments" chip="bubblegum" squiggle="sky" />
           <ImageGallery />
         </section>
       </AnimatedSection>
 
-      <GuestCount />
-
-      <AnimatedSection animation="fade-up" delay={0}>
-        <section className="max-w-md mx-auto px-4 pb-16">
-          <h2 className="text-3xl font-bold text-center text-rose-700 mb-6">
-            RSVP 💌
-          </h2>
-          {RSVP_OPEN ? <RSVPForm /> : <RSVPClosed />}
-        </section>
-      </AnimatedSection>
+      {/* RSVP on a sunny band so it is the most eye-catching thing below
+          the fold */}
+      <section id="rsvp" className="mb-16 scroll-mt-2 text-sunny">
+        <Wave />
+        <div className="bg-sunny px-4 py-12 text-ink md:py-16">
+          <AnimatedSection animation="fade-up" delay={0}>
+            <SectionHeading eyebrow="Save your spot" title="RSVP" chip="white" squiggle="coral" />
+            <GuestCount />
+            <div className="mx-auto max-w-md">
+              {RSVP_OPEN ? <RSVPForm /> : <RSVPClosed />}
+            </div>
+          </AnimatedSection>
+        </div>
+        <Wave flip />
+      </section>
 
       <AnimatedSection animation="fade-up" delay={0}>
         <ContactSection
-          name="Rama Myers"
-          phone="401-499-8727"
+          name={HOST.fullName}
+          phone={HOST.phone}
         />
       </AnimatedSection>
 

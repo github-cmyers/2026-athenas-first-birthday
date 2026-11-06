@@ -1,6 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import { HOST, MAX_FAMILY_MEMBERS, telHref } from "@/lib/event";
+import { BG, PARTY_COLORS } from "./decor";
+
+// Shared look for the text inputs and the select: a soft outline at rest that
+// firms up to full ink with a sky glow when focused.
+const FIELD_CLASSES =
+  "peer w-full rounded-2xl border-[2.5px] border-ink/25 bg-white px-4 py-4 pt-6 text-ink transition-all focus:border-ink focus:outline-none focus:ring-4 focus:ring-sky/40 disabled:opacity-50";
 
 // Floating label input component
 function FloatingInput({
@@ -35,7 +42,7 @@ function FloatingInput({
         onChange={onChange}
         disabled={disabled}
         placeholder=" "
-        className="peer w-full px-4 py-4 pt-6 rounded-xl border-2 border-pink-200 focus:border-pink-400 focus:outline-none transition-all text-gray-900 disabled:opacity-50 bg-white"
+        className={FIELD_CLASSES}
       />
       {/* At rest the label is centred against the input's full height rather
           than pinned near the top; the input is taller than its text because
@@ -44,9 +51,9 @@ function FloatingInput({
         htmlFor={id}
         className={`pointer-events-none absolute left-4 transition-all duration-200 ${
           hasValue
-            ? "top-2 translate-y-0 text-xs text-pink-500"
-            : "top-1/2 -translate-y-1/2 text-base text-gray-500"
-        } peer-focus:top-2 peer-focus:translate-y-0 peer-focus:text-xs peer-focus:text-pink-500`}
+            ? "top-2 translate-y-0 text-xs font-semibold text-ink/70"
+            : "top-1/2 -translate-y-1/2 text-base text-ink/50"
+        } peer-focus:top-2 peer-focus:translate-y-0 peer-focus:text-xs peer-focus:font-semibold peer-focus:text-ink/70`}
       >
         {label}
       </label>
@@ -63,6 +70,7 @@ function FloatingSelect({
   onChange,
   disabled,
   options,
+  describedBy,
 }: {
   id: string;
   name: string;
@@ -71,6 +79,7 @@ function FloatingSelect({
   onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
   disabled: boolean;
   options: { value: string; label: string }[];
+  describedBy?: string;
 }) {
   return (
     <div className="relative">
@@ -80,7 +89,8 @@ function FloatingSelect({
         value={value}
         onChange={onChange}
         disabled={disabled}
-        className="peer w-full px-4 py-4 pt-6 rounded-xl border-2 border-pink-200 focus:border-pink-400 focus:outline-none transition-all text-gray-900 disabled:opacity-50 bg-white appearance-none cursor-pointer"
+        aria-describedby={describedBy}
+        className={`${FIELD_CLASSES} cursor-pointer appearance-none`}
       >
         {options.map((opt) => (
           <option key={opt.value} value={opt.value}>
@@ -90,14 +100,14 @@ function FloatingSelect({
       </select>
       <label
         htmlFor={id}
-        className="absolute left-4 top-2 text-xs text-pink-500 transition-all duration-200 pointer-events-none"
+        className="pointer-events-none absolute left-4 top-2 text-xs font-semibold text-ink/70"
       >
         {label}
       </label>
       {/* Dropdown arrow */}
-      <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
-        <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+      <div className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2">
+        <svg className="h-5 w-5 text-ink" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
         </svg>
       </div>
     </div>
@@ -115,23 +125,21 @@ function AttendanceChoice({
   onChange: (value: boolean) => void;
   disabled: boolean;
 }) {
-  // Each option carries its own selected/focus colours as complete class
-  // strings - Tailwind only emits utilities it can see written out literally,
-  // so these cannot be built by interpolating a colour name.
+  // Each option carries its own selected colour as a complete class string -
+  // Tailwind only emits utilities it can see written out literally, so these
+  // cannot be built by interpolating a colour name. Accept stays green.
   const options = [
     {
       value: true,
       icon: "🎉",
       label: "Joyfully accepts",
-      highlight:
-        "peer-checked:border-green-500 peer-checked:bg-green-50 peer-focus-visible:ring-green-400",
+      highlight: "peer-checked:bg-green-200",
     },
     {
       value: false,
       icon: "💌",
       label: "Regretfully declines",
-      highlight:
-        "peer-checked:border-pink-500 peer-checked:bg-pink-50 peer-focus-visible:ring-pink-400",
+      highlight: "peer-checked:bg-bubblegum/35",
     },
   ];
 
@@ -140,7 +148,7 @@ function AttendanceChoice({
   // even `m-0` would beat it and collapse the gap below this group.
   return (
     <fieldset disabled={disabled} className="border-0 p-0">
-      <legend className="text-sm font-medium text-gray-600 mb-3 px-1">
+      <legend className="mb-3 px-1 font-display text-lg font-semibold text-ink">
         Will you be joining us?
       </legend>
       <div className="grid grid-cols-2 gap-3">
@@ -155,10 +163,10 @@ function AttendanceChoice({
               className="peer sr-only"
             />
             <div
-              className={`rounded-xl border-2 border-pink-200 px-3 py-4 text-center transition-all peer-focus-visible:ring-2 peer-focus-visible:ring-offset-2 peer-disabled:opacity-50 ${option.highlight}`}
+              className={`rounded-2xl border-[2.5px] border-ink/25 px-3 py-4 text-center transition-all peer-checked:border-ink peer-checked:shadow-[3px_3px_0_0_var(--color-ink)] peer-focus-visible:ring-4 peer-focus-visible:ring-sky/50 peer-disabled:opacity-50 ${option.highlight}`}
             >
-              <div className="text-2xl mb-1">{option.icon}</div>
-              <div className="text-sm font-semibold text-gray-800">
+              <div className="mb-1 text-2xl">{option.icon}</div>
+              <div className="font-display text-base font-semibold text-ink">
                 {option.label}
               </div>
             </div>
@@ -169,6 +177,15 @@ function AttendanceChoice({
   );
 }
 
+// Positions for the confetti that rains down on an acceptance.
+const CONFETTI_PIECES = Array.from({ length: 16 }, (_, i) => ({
+  left: (i * 41 + 5) % 100,
+  delay: (i % 8) * 0.12,
+  duration: 2.2 + (i % 5) * 0.25,
+  color: BG[PARTY_COLORS[i % PARTY_COLORS.length]],
+  shape: i % 2 === 0 ? "h-2 w-3.5 rounded-sm" : "h-2.5 w-2.5 rounded-full",
+}));
+
 // Animated success component
 function SuccessMessage({
   name,
@@ -178,30 +195,36 @@ function SuccessMessage({
   attending: boolean;
 }) {
   return (
-    <div className="success-container bg-gradient-to-br from-pink-100 via-rose-100 to-pink-50 border-2 border-pink-300 rounded-2xl p-8 text-center overflow-hidden relative">
-      {/* Floating hearts background - celebratory only for acceptances */}
+    <div className="success-container sticker relative overflow-hidden p-8 text-center">
+      {/* Confetti shower - celebratory only for acceptances */}
       {attending && (
-        <div className="floating-hearts">
-          <span className="heart heart-1">💕</span>
-          <span className="heart heart-2">💖</span>
-          <span className="heart heart-3">💗</span>
-          <span className="heart heart-4">✨</span>
-          <span className="heart heart-5">🎉</span>
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
+          {CONFETTI_PIECES.map((piece, i) => (
+            <span
+              key={i}
+              className={`confetti-piece absolute top-0 ${piece.color} ${piece.shape}`}
+              style={{
+                left: `${piece.left}%`,
+                animationDelay: `${piece.delay}s`,
+                animationDuration: `${piece.duration}s`,
+              }}
+            />
+          ))}
         </div>
       )}
 
       {/* Main content with staggered animations */}
       <div className="relative z-10">
-        <div className="icon-pop text-5xl mb-4">{attending ? "💖" : "💌"}</div>
-        <h3 className="title-slide text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-600 to-rose-600 mb-3">
+        <div className="icon-pop mb-4 text-6xl">{attending ? "🎈" : "💌"}</div>
+        <h3 className="title-slide mb-3 font-display text-4xl font-bold text-ink">
           Thank You!
         </h3>
-        <p className="message-fade text-rose-700 text-lg">
+        <p className="message-fade text-lg text-ink/80">
           {attending
             ? "We can't wait to celebrate with you,"
             : "We're sorry you can't make it, but thank you for letting us know,"}
         </p>
-        <p className="name-pop text-xl font-semibold text-rose-800 mt-1">
+        <p className="name-pop mt-1 font-display text-2xl font-semibold text-ink">
           {name}! {attending ? "🎉" : "💗"}
         </p>
       </div>
@@ -254,41 +277,17 @@ function SuccessMessage({
           100% { transform: scale(1); opacity: 1; }
         }
 
-        /* Floating hearts */
-        .floating-hearts {
-          position: absolute;
-          inset: 0;
-          pointer-events: none;
-          overflow: hidden;
-        }
-
-        .heart {
-          position: absolute;
-          font-size: 1.5rem;
+        .confetti-piece {
           opacity: 0;
-          animation: float-up 3s ease-out forwards;
+          animation-name: confetti-fall;
+          animation-timing-function: ease-in;
+          animation-fill-mode: forwards;
         }
 
-        .heart-1 { left: 10%; animation-delay: 0.3s; }
-        .heart-2 { left: 30%; animation-delay: 0.5s; }
-        .heart-3 { left: 50%; animation-delay: 0.7s; }
-        .heart-4 { left: 70%; animation-delay: 0.9s; }
-        .heart-5 { left: 85%; animation-delay: 1.1s; }
-
-        @keyframes float-up {
-          0% {
-            bottom: -20px;
-            opacity: 0;
-            transform: scale(0.5) rotate(0deg);
-          }
-          20% {
-            opacity: 1;
-          }
-          100% {
-            bottom: 100%;
-            opacity: 0;
-            transform: scale(1) rotate(20deg);
-          }
+        @keyframes confetti-fall {
+          0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+          85% { opacity: 1; }
+          100% { transform: translateY(420px) rotate(540deg); opacity: 0; }
         }
       `}</style>
     </div>
@@ -298,7 +297,7 @@ function SuccessMessage({
 export default function RSVPForm() {
   const [formData, setFormData] = useState({
     name: "",
-    plusOne: "0",
+    familyMembers: "1",
     phone: "",
     email: "",
   });
@@ -318,7 +317,7 @@ export default function RSVPForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...formData,
-          plusOne: attending ? parseInt(formData.plusOne) : 0,
+          familyMembers: attending ? Number(formData.familyMembers) : 0,
           attending,
         }),
       });
@@ -351,12 +350,9 @@ export default function RSVPForm() {
   }
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="bg-white rounded-2xl p-6 shadow-lg space-y-5"
-    >
+    <form onSubmit={handleSubmit} className="sticker space-y-5 p-6 md:p-8">
       {error && (
-        <div className="bg-red-100 border-2 border-red-300 rounded-xl p-4 text-red-700 text-center">
+        <div className="rounded-2xl border-[2.5px] border-red-700 bg-red-100 p-4 text-center font-semibold text-red-800">
           {error}
         </div>
       )}
@@ -378,20 +374,50 @@ export default function RSVPForm() {
         disabled={loading}
       />
 
-      {/* Only meaningful for acceptances - someone who declines brings no one */}
+      {/* Only meaningful for acceptances - someone who declines brings no one.
+          The count includes the guest themselves, so the smallest answer is 1
+          and nobody has to work out whether to count themselves. */}
       {attending && (
-        <FloatingSelect
-          id="plusOne"
-          name="plusOne"
-          label="Number of Additional Guests (+1s)"
-          value={formData.plusOne}
-          onChange={handleChange}
-          disabled={loading}
-          options={[0, 1, 2, 3, 4, 5].map((num) => ({
-            value: String(num),
-            label: String(num),
-          }))}
-        />
+        <div className="space-y-3">
+          <div>
+            <FloatingSelect
+              id="familyMembers"
+              name="familyMembers"
+              label="Number of your attending family members"
+              value={formData.familyMembers}
+              onChange={handleChange}
+              disabled={loading}
+              describedBy="familyMembers-hint familyMembers-note"
+              options={Array.from({ length: MAX_FAMILY_MEMBERS }, (_, i) => {
+                const num = i + 1;
+                return {
+                  value: String(num),
+                  label: num === 1 ? "1 (just me)" : String(num),
+                };
+              })}
+            />
+            <p id="familyMembers-hint" className="mt-1.5 px-1 text-sm text-ink/60">
+              Please include yourself in this number.
+            </p>
+          </div>
+
+          <p
+            id="familyMembers-note"
+            className="rounded-2xl border-[2.5px] border-dashed border-coral bg-coral/10 px-4 py-3 text-sm text-ink"
+          >
+            <span className="font-bold">
+              Bringing someone outside your immediate family?
+            </span>{" "}
+            Please reach out to {HOST.firstName} at{" "}
+            <a
+              href={telHref(HOST.phone)}
+              className="font-bold underline decoration-2 underline-offset-2"
+            >
+              {HOST.phone}
+            </a>{" "}
+            beforehand.
+          </p>
+        </div>
       )}
 
       <FloatingInput
@@ -419,7 +445,7 @@ export default function RSVPForm() {
       <button
         type="submit"
         disabled={loading}
-        className="w-full py-4 bg-gradient-to-r from-pink-500 to-rose-500 text-white font-bold text-lg rounded-xl hover:from-pink-600 hover:to-rose-600 transition-all duration-300 hover:scale-105 shadow-lg disabled:opacity-50 disabled:hover:scale-100"
+        className="btn-chunky w-full bg-coral py-4 text-xl"
       >
         {loading
           ? "Submitting..."

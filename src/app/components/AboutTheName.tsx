@@ -1,3 +1,5 @@
+import { PartyOwl, SectionHeading } from "./decor";
+
 interface AboutTheNameProps {
   name: string;
   origin: string;
@@ -7,33 +9,29 @@ interface AboutTheNameProps {
 
 export default function AboutTheName({ name, origin, meaning, reason }: AboutTheNameProps) {
   return (
-    <section className="max-w-2xl mx-auto px-4 mb-12">
-      <div className="bg-white/70 backdrop-blur rounded-2xl p-6 shadow-lg">
-        <h2 className="text-2xl font-bold text-rose-700 mb-4 text-center">
-          About the Name
-        </h2>
-        <div className="text-center mb-4">
-          <span className="text-5xl font-bold bg-gradient-to-r from-pink-500 via-rose-500 to-pink-400 bg-clip-text text-transparent">
-            {name}
-          </span>
+    <section className="mx-auto mb-20 max-w-3xl px-4">
+      <SectionHeading eyebrow="Her name" title={`Why ${name}?`} chip="grape" squiggle="mint" />
+
+      <div className="sticker bg-lilac p-6 md:flex md:items-center md:gap-10 md:p-10">
+        <div className="text-center md:w-1/3 md:shrink-0">
+          <PartyOwl hat={false} className="mx-auto w-28 md:w-36" />
+          <div className="mt-3 font-display text-5xl font-bold text-ink">{name}</div>
+          <span className="chip mt-3 bg-white text-xs">{origin} origin</span>
+          <p className="mt-4 text-sm text-ink/70">
+            The owl, symbol of Athena, represents wisdom and knowledge
+          </p>
         </div>
-        <div className="space-y-4 text-gray-700">
-          <p>
-            <span className="font-semibold text-rose-600">Origin:</span> {origin}
-          </p>
-          <p>
-            <span className="font-semibold text-rose-600">Meaning:</span> {meaning}
-          </p>
-          <p>
-            <span className="font-semibold text-rose-600">Why we chose it:</span> {reason}
-          </p>
-          <div className="text-center pt-2">
-            <span className="text-3xl">🦉</span>
-            <p className="text-sm text-rose-500 mt-1">
-              The owl, symbol of Athena, represents wisdom and knowledge
-            </p>
+
+        <dl className="mt-8 space-y-5 text-ink/85 md:mt-0">
+          <div>
+            <dt className="font-display text-xl font-semibold text-ink">Meaning</dt>
+            <dd className="mt-1 leading-relaxed">{meaning}</dd>
           </div>
-        </div>
+          <div>
+            <dt className="font-display text-xl font-semibold text-ink">Why we chose it</dt>
+            <dd className="mt-1 leading-relaxed">{reason}</dd>
+          </div>
+        </dl>
       </div>
     </section>
   );

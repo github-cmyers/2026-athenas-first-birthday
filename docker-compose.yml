@@ -1,11 +1,11 @@
 services:
   postgres:
     image: postgres:15
-    container_name: naming-ceremony-postgres
+    container_name: first-birthday-postgres
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=naming_ceremony
+      - POSTGRES_DB=first_birthday
     ports:
       - "5432:5432"
     volumes:
@@ -20,11 +20,11 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: naming-ceremony-app
+    container_name: first-birthday-app
     ports:
       - "3002:3000"
     environment:
-      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/naming_ceremony
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/first_birthday
     depends_on:
       postgres:
         condition: service_healthy

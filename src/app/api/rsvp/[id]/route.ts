@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { query } from "@/lib/db";
-import { ensureRsvpTable } from "@/lib/rsvp";
+import { ensureRsvpTable, RSVP_TABLE } from "@/lib/rsvp";
 import { isAuthenticated } from "@/lib/adminSession";
 
 export async function DELETE(
@@ -24,7 +24,7 @@ export async function DELETE(
     await ensureRsvpTable();
 
     const result = await query<{ id: number }>(
-      "DELETE FROM RSVP_Naming_Ceremony WHERE Id = $1 RETURNING Id",
+      `DELETE FROM ${RSVP_TABLE} WHERE Id = $1 RETURNING Id`,
       [rsvpId]
     );
 

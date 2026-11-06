@@ -1,124 +1,85 @@
-"use client";
+import { Balloon, Bunting, Confetti, PartyOwl } from "./decor";
+import { formatEventDate, formatEventTime, partyDate } from "@/lib/event";
 
-import { useState } from "react";
+// Each letter of the giant "ONE!" gets its own colour and resting tilt; the
+// bob animation sits on an inner span so it doesn't fight the tilt.
+const LETTERS = [
+  { char: "O", color: "text-coral", tilt: "-rotate-6", delay: "0s" },
+  { char: "N", color: "text-sunny", tilt: "rotate-3", delay: "-0.6s" },
+  { char: "E", color: "text-mint", tilt: "-rotate-3", delay: "-1.2s" },
+  { char: "!", color: "text-grape", tilt: "rotate-6", delay: "-1.8s" },
+];
 
 export default function Hero() {
-  const [isHovered, setIsHovered] = useState(false);
+  const date = formatEventDate(partyDate);
+  const time = formatEventTime(partyDate);
 
   return (
-    <header className="text-center py-16 px-4 overflow-hidden relative">
-      {/* Floating background particles */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        {[...Array(12)].map((_, i) => (
-          <span
-            key={i}
-            className="absolute text-2xl opacity-40 animate-float"
-            style={{
-              left: `${8 + (i * 8)}%`,
-              top: `${10 + (i % 3) * 30}%`,
-              animationDelay: `${i * 0.5}s`,
-              animationDuration: `${3 + (i % 3)}s`,
-            }}
-          >
-            {["✨", "🌸", "💖", "🎀"][i % 4]}
-          </span>
-        ))}
+    <header className="relative overflow-hidden pb-20">
+      {/* Two swags of bunting on wide screens, one on phones */}
+      <div className="relative z-10 flex">
+        <Bunting flags={9} className="flex-1" />
+        <Bunting flags={9} offset={3} className="hidden flex-1 md:block" />
       </div>
 
-      {/* Top emojis with bounce animation */}
-      <div className="text-6xl mb-4 flex justify-center gap-4">
-        <span className="animate-bounce-slow" style={{ animationDelay: "0s" }}>🌸</span>
-        <span className="animate-pulse-glow">✨</span>
-        <span className="animate-bounce-slow" style={{ animationDelay: "0.5s" }}>💖</span>
+      <Confetti />
+
+      {/* Balloons drifting at the edges */}
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0">
+        <Balloon color="coral" className="absolute left-[3%] top-28 w-12 animate-float md:w-20" />
+        <Balloon color="mint" className="absolute left-[11%] top-72 hidden w-16 animate-float md:block" style={{ animationDelay: "-2s" }} />
+        <Balloon color="sunny" className="absolute right-[4%] top-32 w-12 animate-float md:w-20" style={{ animationDelay: "-3.5s" }} />
+        <Balloon color="bubblegum" className="absolute right-[12%] top-80 hidden w-14 animate-float md:block" style={{ animationDelay: "-1s" }} />
       </div>
 
-      {/* Main heading with hover effect */}
-      <h1
-        className={`text-5xl md:text-7xl font-bold mb-4 cursor-default transition-all duration-500 ease-out relative inline-block
-          ${isHovered
-            ? "scale-110 drop-shadow-[0_0_30px_rgba(244,63,94,0.6)]"
-            : "scale-100"
-          }`}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-      >
-        <span className="bg-gradient-to-r from-pink-500 via-rose-500 to-pink-400 bg-clip-text text-transparent animate-gradient bg-[length:200%_auto]">
-          You&apos;re Invited!
-        </span>
-        {isHovered && (
-          <span className="absolute -top-2 -right-4 text-2xl animate-spin-slow">✨</span>
-        )}
-      </h1>
+      <div className="relative z-10 mx-auto max-w-4xl px-4 text-center">
+        <span className="chip -rotate-3 bg-sunny text-base">You&apos;re invited! 🎉</span>
 
-      {/* Subtitle with fade-in effect */}
-      <p className="text-xl md:text-2xl text-rose-700 font-medium animate-fade-in-up" style={{ animationDelay: "0.2s" }}>
-        Join us for a special celebration
-        <br />
-        <span className="text-rose-600">as we welcome our baby girl at her</span>
-      </p>
+        <p className="mt-6 font-display text-3xl font-semibold text-ink md:text-5xl">
+          Look whooo&apos;s turning
+        </p>
 
-      {/* Naming Ceremony with glow pulse */}
-      <div className="text-4xl md:text-5xl font-bold my-6 relative inline-block">
-        <span className="text-rose-500 animate-text-glow">Naming Ceremony</span>
-        <div className="absolute -inset-4 bg-rose-400/20 blur-xl rounded-full animate-pulse-slow -z-10" />
+        <div className="mt-2 flex items-center justify-center gap-3 md:gap-8">
+          <div aria-hidden="true" className="flex gap-1 text-[5.25rem] md:gap-2 md:text-[10rem]">
+            {LETTERS.map((letter) => (
+              <span key={letter.char} className={`inline-block ${letter.tilt}`}>
+                <span
+                  className={`giant-letter animate-bob ${letter.color}`}
+                  style={{ animationDelay: letter.delay }}
+                >
+                  {letter.char}
+                </span>
+              </span>
+            ))}
+          </div>
+          <PartyOwl className="w-24 shrink-0 origin-bottom animate-wobble md:w-44" />
+        </div>
+
+        <h1 className="mt-6 font-display text-3xl font-bold text-ink md:text-5xl">
+          Athena&apos;s First Birthday
+        </h1>
+        <p className="mx-auto mt-3 max-w-xl text-lg text-ink/80 md:text-xl">
+          Join us for cake, giggles and a whole lot of fun as our baby girl
+          turns one!
+        </p>
+
+        {/* Date and time stack on phones; the separator only makes sense
+            when they sit side by side. */}
+        <p className="mt-6 inline-flex flex-col items-center gap-0.5 rounded-2xl border-[3px] border-ink bg-white px-5 py-2 font-display text-lg font-medium text-ink shadow-[4px_4px_0_0_var(--color-ink)] sm:flex-row sm:gap-3">
+          <span>📅 {date}</span>
+          <span aria-hidden="true" className="hidden text-coral sm:inline">✦</span>
+          <span>⏰ {time}</span>
+        </p>
+
+        <div className="mt-8 flex flex-wrap justify-center gap-4">
+          <a href="#rsvp" className="btn-chunky bg-coral text-lg">
+            RSVP now 💌
+          </a>
+          <a href="#details" className="btn-chunky bg-white text-lg">
+            Party details
+          </a>
+        </div>
       </div>
-
-      {/* Bottom emojis with float animation */}
-      <div className="text-4xl flex justify-center gap-6">
-        <span className="animate-float-rotate" style={{ animationDelay: "0s" }}>🎀</span>
-        <span className="animate-float" style={{ animationDelay: "0.3s" }}>👶</span>
-        <span className="animate-float-rotate" style={{ animationDelay: "0.6s" }}>🕊️</span>
-      </div>
-
-      {/* Custom animations */}
-      <style jsx>{`
-        @keyframes float {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-20px); }
-        }
-        @keyframes float-rotate {
-          0%, 100% { transform: translateY(0px) rotate(-5deg); }
-          50% { transform: translateY(-15px) rotate(5deg); }
-        }
-        @keyframes bounce-slow {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-10px); }
-        }
-        @keyframes pulse-glow {
-          0%, 100% { transform: scale(1); filter: brightness(1); }
-          50% { transform: scale(1.2); filter: brightness(1.5); }
-        }
-        @keyframes spin-slow {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-        @keyframes gradient {
-          0% { background-position: 0% center; }
-          50% { background-position: 100% center; }
-          100% { background-position: 0% center; }
-        }
-        @keyframes fade-in-up {
-          from { opacity: 0; transform: translateY(20px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes text-glow {
-          0%, 100% { text-shadow: 0 0 10px rgba(244,63,94,0.3); }
-          50% { text-shadow: 0 0 25px rgba(244,63,94,0.6), 0 0 50px rgba(244,63,94,0.3); }
-        }
-        @keyframes pulse-slow {
-          0%, 100% { opacity: 0.5; transform: scale(1); }
-          50% { opacity: 0.8; transform: scale(1.1); }
-        }
-        .animate-float { animation: float 3s ease-in-out infinite; }
-        .animate-float-rotate { animation: float-rotate 4s ease-in-out infinite; }
-        .animate-bounce-slow { animation: bounce-slow 2s ease-in-out infinite; }
-        .animate-pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
-        .animate-spin-slow { animation: spin-slow 3s linear infinite; }
-        .animate-gradient { animation: gradient 3s ease infinite; }
-        .animate-fade-in-up { animation: fade-in-up 0.8s ease-out forwards; opacity: 0; }
-        .animate-text-glow { animation: text-glow 2s ease-in-out infinite; }
-        .animate-pulse-slow { animation: pulse-slow 3s ease-in-out infinite; }
-      `}</style>
     </header>
   );
 }

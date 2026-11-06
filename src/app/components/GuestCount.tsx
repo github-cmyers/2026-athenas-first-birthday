@@ -7,6 +7,9 @@ interface RSVPCount {
   guests: number;
 }
 
+const BADGE =
+  "inline-block -rotate-2 rounded-2xl border-[3px] border-ink bg-white px-6 py-3 text-ink shadow-[4px_4px_0_0_var(--color-ink)]";
+
 export default function GuestCount() {
   const [counts, setCounts] = useState<RSVPCount | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -41,9 +44,9 @@ export default function GuestCount() {
 
   if (isLoading) {
     return (
-      <div className="text-center py-4">
-        <div className="inline-block animate-pulse bg-rose-200 rounded-full px-6 py-2">
-          <span className="text-rose-200">Loading...</span>
+      <div className="mb-8 text-center">
+        <div className={`${BADGE} animate-pulse`}>
+          <span className="invisible font-display text-lg">Loading...</span>
         </div>
       </div>
     );
@@ -51,10 +54,10 @@ export default function GuestCount() {
 
   if (!counts || counts.guests === 0) {
     return (
-      <div className="text-center py-4">
-        <div className="inline-block bg-white/70 backdrop-blur rounded-full px-6 py-3 shadow-md">
-          <span className="text-rose-600 font-medium">
-            Be the first to RSVP!
+      <div className="mb-8 text-center">
+        <div className={BADGE}>
+          <span className="font-display text-lg font-semibold">
+            🎈 Be the first to RSVP!
           </span>
         </div>
       </div>
@@ -62,19 +65,19 @@ export default function GuestCount() {
   }
 
   return (
-    <div className="text-center py-4">
-      <div className="inline-block bg-white/70 backdrop-blur rounded-full px-8 py-4 shadow-md">
-        <div className="flex items-center gap-3">
-          <span className="text-3xl">🎉</span>
-          <div>
-            <span className="text-2xl font-bold text-rose-600">{counts.guests}</span>
-            <span className="text-rose-700 font-medium ml-2">
+    <div className="mb-8 text-center">
+      <div className={BADGE}>
+        <div className="flex items-center justify-center gap-3">
+          <span className="text-3xl" aria-hidden="true">🎉</span>
+          <div className="font-display">
+            <span className="text-3xl font-bold">{counts.guests}</span>
+            <span className="ml-2 text-lg font-medium">
               {counts.guests === 1 ? "guest" : "guests"} coming
             </span>
           </div>
-          <span className="text-3xl">🎉</span>
+          <span className="text-3xl" aria-hidden="true">🎉</span>
         </div>
-        <p className="text-sm text-rose-500 mt-1">
+        <p className="mt-0.5 text-sm text-ink/70">
           {counts.families} {counts.families === 1 ? "family" : "families"} have RSVP&apos;d
         </p>
       </div>

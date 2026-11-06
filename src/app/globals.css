@@ -1,26 +1,154 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
+/* Fonts come from next/font in layout.tsx. Fredoka is the rounded display
+   face for headings, numbers and buttons; Nunito is the body text. */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-nunito), ui-rounded, system-ui, sans-serif;
+  --font-display: var(--font-fredoka), ui-rounded, system-ui, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* Birthday palette. Text sits in ink on every colour here - white on these
+   brights is too low-contrast to read comfortably. */
+@theme {
+  --color-ink: #2b1d4e;
+  --color-cream: #fff8ec;
+  --color-lilac: #efe9ff;
+  --color-coral: #ff6b5e;
+  --color-sunny: #ffc93c;
+  --color-mint: #4fd1c5;
+  --color-grape: #a78bfa;
+  --color-bubblegum: #ff8fb1;
+  --color-sky: #6ec3f4;
+
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-sway: sway 3.2s ease-in-out infinite;
+  --animate-wobble: wobble 4s ease-in-out infinite;
+  --animate-bob: bob 2.6s ease-in-out infinite;
+  --animate-drift: drift 8s ease-in-out infinite;
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0) rotate(-3deg); }
+    50% { transform: translateY(-18px) rotate(3deg); }
+  }
+  @keyframes sway {
+    0%, 100% { transform: rotate(-5deg); }
+    50% { transform: rotate(5deg); }
+  }
+  @keyframes wobble {
+    0%, 100% { transform: rotate(-4deg); }
+    50% { transform: rotate(4deg) translateY(-4px); }
+  }
+  @keyframes bob {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+  @keyframes drift {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-14px) rotate(180deg); }
   }
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
+/* The invitation is designed as a single light theme on purpose, so the page
+   reads the same whatever the guest's system setting is. */
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-cream);
+  color: var(--color-ink);
+}
+
+@layer components {
+  /* Cream with scattered sprinkles, drawn as one repeating SVG tile. */
+  .sprinkles {
+    background-color: var(--color-cream);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cg opacity='.4'%3E%3Crect x='20' y='30' width='18' height='6' rx='3' fill='%23ff6b5e' transform='rotate(35 29 33)'/%3E%3Crect x='150' y='24' width='18' height='6' rx='3' fill='%234fd1c5' transform='rotate(-20 159 27)'/%3E%3Crect x='96' y='96' width='18' height='6' rx='3' fill='%23a78bfa' transform='rotate(70 105 99)'/%3E%3Crect x='190' y='140' width='18' height='6' rx='3' fill='%23ffc93c' transform='rotate(15 199 143)'/%3E%3Crect x='36' y='170' width='18' height='6' rx='3' fill='%236ec3f4' transform='rotate(-45 45 173)'/%3E%3Crect x='126' y='196' width='18' height='6' rx='3' fill='%23ff8fb1' transform='rotate(60 135 199)'/%3E%3Ccircle cx='72' cy='118' r='4' fill='%23ffc93c'/%3E%3Ccircle cx='212' cy='78' r='3.5' fill='%23ff6b5e'/%3E%3Ccircle cx='140' cy='150' r='3' fill='%234fd1c5'/%3E%3Ccircle cx='14' cy='98' r='3' fill='%23ff8fb1'/%3E%3Ccircle cx='176' cy='214' r='3' fill='%23a78bfa'/%3E%3Ccircle cx='58' cy='224' r='3' fill='%236ec3f4'/%3E%3C/g%3E%3C/svg%3E");
+  }
+
+  /* The core card: thick ink outline with a hard offset shadow, like a
+     sticker. Background colour utilities override the white. */
+  .sticker {
+    background-color: #fff;
+    border: 3px solid var(--color-ink);
+    border-radius: 1.75rem;
+    box-shadow: 6px 6px 0 0 var(--color-ink);
+  }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.3rem 0.95rem;
+    border: 2.5px solid var(--color-ink);
+    border-radius: 9999px;
+    box-shadow: 3px 3px 0 0 var(--color-ink);
+    color: var(--color-ink);
+    font-family: var(--font-display);
+    font-size: 0.875rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  /* Chunky press-down button. Hover lifts it, pressing pushes it into its
+     shadow. */
+  .btn-chunky {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border: 3px solid var(--color-ink);
+    border-radius: 1rem;
+    box-shadow: 4px 4px 0 0 var(--color-ink);
+    color: var(--color-ink);
+    font-family: var(--font-display);
+    font-weight: 600;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .btn-chunky:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 0 var(--color-ink);
+  }
+  .btn-chunky:active {
+    transform: translate(3px, 3px);
+    box-shadow: 1px 1px 0 0 var(--color-ink);
+  }
+  .btn-chunky:focus-visible {
+    outline: 3px solid var(--color-sky);
+    outline-offset: 3px;
+  }
+  .btn-chunky:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+    transform: none;
+    box-shadow: 4px 4px 0 0 var(--color-ink);
+  }
+
+  /* The giant "ONE" in the hero: filled letter, ink outline painted behind
+     the fill so it stays crisp, and a hard ink drop shadow. */
+  .giant-letter {
+    display: inline-block;
+    font-family: var(--font-display);
+    font-weight: 700;
+    line-height: 0.9;
+    -webkit-text-stroke: 0.06em var(--color-ink);
+    paint-order: stroke fill;
+    text-shadow: 0.05em 0.05em 0 var(--color-ink);
+  }
+}
+
+/* Decorative motion is a nice-to-have; respect guests who have asked their
+   system for less of it. The !important also beats AnimatedSection's inline
+   transitions, so sections simply appear. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

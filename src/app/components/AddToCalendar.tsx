@@ -58,7 +58,7 @@ export default function AddToCalendar({
     const icsContent = [
       "BEGIN:VCALENDAR",
       "VERSION:2.0",
-      "PRODID:-//Naming Ceremony//EN",
+      "PRODID:-//Athena's First Birthday//EN",
       "CALSCALE:GREGORIAN",
       "METHOD:PUBLISH",
       "BEGIN:VEVENT",
@@ -80,7 +80,7 @@ export default function AddToCalendar({
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = "naming-ceremony.ics";
+    link.download = "athenas-first-birthday.ics";
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -92,7 +92,8 @@ export default function AddToCalendar({
     <div className="relative inline-block">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="inline-flex items-center gap-2 px-6 py-2 bg-rose-500 hover:bg-rose-600 text-white font-semibold rounded-lg transition-colors"
+        aria-expanded={isOpen}
+        className="btn-chunky bg-sunny"
       >
         <svg
           className="w-5 h-5"
@@ -127,13 +128,13 @@ export default function AddToCalendar({
           />
 
           {/* Dropdown menu */}
-          <div className="absolute left-1/2 -translate-x-1/2 mt-2 w-56 bg-white rounded-xl shadow-lg border border-rose-100 z-20 overflow-hidden">
+          <div className="absolute left-1/2 -translate-x-1/2 mt-3 w-60 bg-white rounded-2xl border-[3px] border-ink shadow-[5px_5px_0_0_var(--color-ink)] z-20 overflow-hidden text-left">
             <a
               href={getGoogleCalendarUrl()}
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => setIsOpen(false)}
-              className="flex items-center gap-3 px-4 py-3 hover:bg-rose-50 transition-colors text-gray-700"
+              className="flex items-center gap-3 px-4 py-3 hover:bg-sunny/25 transition-colors text-ink font-semibold"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24">
                 <path
@@ -161,7 +162,7 @@ export default function AddToCalendar({
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => setIsOpen(false)}
-              className="flex items-center gap-3 px-4 py-3 hover:bg-rose-50 transition-colors text-gray-700 border-t border-rose-50"
+              className="flex items-center gap-3 px-4 py-3 hover:bg-sunny/25 transition-colors text-ink font-semibold border-t-2 border-ink/10"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24">
                 <path
@@ -174,9 +175,9 @@ export default function AddToCalendar({
 
             <button
               onClick={downloadICS}
-              className="flex items-center gap-3 px-4 py-3 hover:bg-rose-50 transition-colors text-gray-700 border-t border-rose-50 w-full text-left"
+              className="flex items-center gap-3 px-4 py-3 hover:bg-sunny/25 transition-colors text-ink font-semibold border-t-2 border-ink/10 w-full text-left"
             >
-              <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 text-ink/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -185,7 +186,7 @@ export default function AddToCalendar({
                 />
               </svg>
               Download .ics file
-              <span className="text-xs text-gray-400 ml-auto">Apple / Other</span>
+              <span className="text-xs font-normal text-ink/50 ml-auto">Apple / Other</span>
             </button>
           </div>
         </>

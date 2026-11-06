@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { query } from "@/lib/db";
-import { ensureRsvpTable } from "@/lib/rsvp";
+import { ensureRsvpTable, RSVP_TABLE } from "@/lib/rsvp";
 
 export async function GET() {
   try {
@@ -8,6 +8,8 @@ export async function GET() {
 
     // Get aggregated counts only - no personal data exposed.
     // Declines are counted separately so they never inflate the headcount.
+    // FamilyMembers already includes the person who replied, so the headcount
+    // is a plain sum with nothing added per RSVP.
     const result = await query<{
       families: string;
       guests: string;
@@ -15,10 +17,9 @@ export async function GET() {
     }>(`
       SELECT
         COUNT(*) FILTER (WHERE Attending) as families,
-        COALESCE(SUM(PlusOne) FILTER (WHERE Attending), 0)
-          + COUNT(*) FILTER (WHERE Attending) as guests,
+        COALESCE(SUM(FamilyMembers) FILTER (WHERE Attending), 0) as guests,
         COUNT(*) FILTER (WHERE NOT Attending) as declined
-      FROM RSVP_Naming_Ceremony
+      FROM ${RSVP_TABLE}
     `);
 
     const row = result.rows[0];

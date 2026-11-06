@@ -5,7 +5,8 @@ import { useState, useEffect } from "react";
 interface RSVP {
   id: number;
   name: string;
-  plusone: number;
+  // Everyone the RSVP covers, the guest included; 0 for a decline.
+  familymembers: number;
   phone: string;
   email: string;
   attending: boolean;
@@ -44,15 +45,15 @@ function DeleteConfirmDialog({
         role="alertdialog"
         aria-modal="true"
         aria-labelledby="delete-title"
-        className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl"
+        className="w-full max-w-md sticker p-6"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 id="delete-title" className="text-xl font-bold text-rose-700 mb-2">
+        <h2 id="delete-title" className="font-display text-xl font-bold text-ink mb-2">
           Remove this RSVP?
         </h2>
         <p className="text-gray-700 mb-1">
           <span className="font-semibold">{rsvp.name}</span>
-          {rsvp.plusone > 0 && ` (+${rsvp.plusone})`} will be permanently
+          {rsvp.familymembers > 1 && ` (party of ${rsvp.familymembers})`} will be permanently
           removed from the guest list.
         </p>
         <p className="text-sm text-gray-500 mb-5">This cannot be undone.</p>
@@ -202,17 +203,17 @@ export default function AdminPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-pink-100 via-rose-100 to-pink-50 flex items-center justify-center">
-        <div className="text-rose-600 text-xl">Loading...</div>
+      <div className="min-h-screen sprinkles flex items-center justify-center">
+        <div className="text-ink text-xl">Loading...</div>
       </div>
     );
   }
 
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-pink-100 via-rose-100 to-pink-50 flex items-center justify-center px-4">
-        <div className="bg-white/70 backdrop-blur rounded-2xl p-8 shadow-lg w-full max-w-md">
-          <h1 className="text-3xl font-bold text-rose-700 text-center mb-6">
+      <div className="min-h-screen sprinkles flex items-center justify-center px-4">
+        <div className="sticker p-8 w-full max-w-md">
+          <h1 className="font-display text-3xl font-bold text-ink text-center mb-6">
             Admin Login
           </h1>
           <form onSubmit={handleLogin} className="space-y-4">
@@ -228,7 +229,7 @@ export default function AdminPage() {
                 id="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-2 border border-rose-200 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent text-gray-900"
+                className="w-full px-4 py-2 border-[2.5px] border-ink/25 rounded-xl focus:outline-none focus:border-ink focus:ring-4 focus:ring-sky/40 text-gray-900"
                 required
               />
             </div>
@@ -237,7 +238,7 @@ export default function AdminPage() {
             )}
             <button
               type="submit"
-              className="w-full py-2 px-4 bg-rose-500 hover:bg-rose-600 text-white font-semibold rounded-lg transition-colors"
+              className="btn-chunky w-full bg-coral"
             >
               Login
             </button>
@@ -248,46 +249,46 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-pink-100 via-rose-100 to-pink-50 py-8 px-4">
+    <div className="min-h-screen sprinkles py-8 px-4">
       <div className="max-w-6xl mx-auto">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-rose-700">RSVP Submissions</h1>
+          <h1 className="font-display text-3xl font-bold text-ink">RSVP Submissions</h1>
           <button
             onClick={handleLogout}
-            className="py-2 px-4 bg-gray-500 hover:bg-gray-600 text-white font-semibold rounded-lg transition-colors"
+            className="btn-chunky bg-white py-2"
           >
             Logout
           </button>
         </div>
 
         {dataLoading ? (
-          <div className="text-center text-rose-600">Loading RSVPs...</div>
+          <div className="text-center text-ink">Loading RSVPs...</div>
         ) : rsvps.length === 0 ? (
-          <div className="bg-white/70 backdrop-blur rounded-2xl p-8 shadow-lg text-center">
+          <div className="sticker p-8 text-center">
             <p className="text-gray-600">No RSVPs yet.</p>
           </div>
         ) : (
-          <div className="bg-white/70 backdrop-blur rounded-2xl shadow-lg overflow-hidden">
+          <div className="sticker overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-rose-100">
+                <thead className="bg-sunny/40">
                   <tr>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-rose-700">
+                    <th className="px-6 py-3 text-left text-sm font-bold text-ink">
                       Name
                     </th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-rose-700">
+                    <th className="px-6 py-3 text-left text-sm font-bold text-ink">
                       Response
                     </th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-rose-700">
-                      Additional Guests
+                    <th className="px-6 py-3 text-left text-sm font-bold text-ink">
+                      Family Members
                     </th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-rose-700">
+                    <th className="px-6 py-3 text-left text-sm font-bold text-ink">
                       Phone
                     </th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-rose-700">
+                    <th className="px-6 py-3 text-left text-sm font-bold text-ink">
                       Email
                     </th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-rose-700">
+                    <th className="px-6 py-3 text-left text-sm font-bold text-ink">
                       Submitted
                     </th>
                     <th className="px-6 py-3 text-right">
@@ -295,9 +296,9 @@ export default function AdminPage() {
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-rose-100">
+                <tbody className="divide-y divide-ink/10">
                   {rsvps.map((rsvp) => (
-                    <tr key={rsvp.id} className="hover:bg-rose-50/50">
+                    <tr key={rsvp.id} className="hover:bg-sunny/10">
                       <td className="px-6 py-4 text-sm text-gray-900">
                         {rsvp.name}
                       </td>
@@ -313,7 +314,7 @@ export default function AdminPage() {
                         </span>
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-900">
-                        {rsvp.attending ? rsvp.plusone : "—"}
+                        {rsvp.attending ? rsvp.familymembers : "—"}
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-900">
                         {rsvp.phone}
@@ -356,12 +357,12 @@ export default function AdminPage() {
                 </tbody>
               </table>
             </div>
-            <div className="px-6 py-4 bg-rose-50 border-t border-rose-100">
-              <p className="text-sm text-rose-700">
+            <div className="px-6 py-4 bg-lilac border-t-2 border-ink/10">
+              <p className="text-sm text-ink">
                 Total: {rsvps.length} RSVP{rsvps.length !== 1 ? "s" : ""} |
                 Attending:{" "}
                 {rsvps.reduce(
-                  (sum, r) => (r.attending ? sum + 1 + r.plusone : sum),
+                  (sum, r) => (r.attending ? sum + r.familymembers : sum),
                   0
                 )}{" "}
                 | Declined: {rsvps.filter((r) => !r.attending).length}

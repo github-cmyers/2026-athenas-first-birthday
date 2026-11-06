@@ -1,20 +1,20 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Fredoka, Nunito } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const fredoka = Fredoka({
+  variable: "--font-fredoka",
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const nunito = Nunito({
+  variable: "--font-nunito",
   subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
-  title: "Naming Ceremony Invitation",
-  description: "You're invited to our baby girl's naming ceremony",
+  title: "Athena's First Birthday",
+  description: "You're invited to celebrate our baby girl's first birthday",
 };
 
 export default function RootLayout({
@@ -23,12 +23,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
-      </body>
+    // The font variables go on <html>, not <body>: Tailwind declares
+    // --font-display and --font-sans on :root in terms of these, and a custom
+    // property is resolved where it is declared - on <body> they would be
+    // undefined at :root and every var(--font-display) would fall back.
+    <html lang="en" className={`${fredoka.variable} ${nunito.variable}`}>
+      <body className="font-sans antialiased">{children}</body>
     </html>
   );
 }

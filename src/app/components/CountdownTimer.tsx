@@ -13,6 +13,34 @@ interface CountdownTimerProps {
   targetDate: Date;
 }
 
+// One baby block per unit, each its own colour and resting tilt.
+const BLOCKS = [
+  { label: "Days", style: "bg-coral -rotate-3" },
+  { label: "Hours", style: "bg-sunny rotate-2" },
+  { label: "Minutes", style: "bg-mint -rotate-2" },
+  { label: "Seconds", style: "bg-grape rotate-3" },
+] as const;
+
+function Blocks({ values }: { values: (number | null)[] }) {
+  return (
+    <div className="mx-auto grid max-w-xl grid-cols-4 gap-3 md:gap-6">
+      {BLOCKS.map((block, i) => (
+        <div
+          key={block.label}
+          className={`flex aspect-square flex-col items-center justify-center rounded-2xl border-[3px] border-ink text-ink shadow-[5px_5px_0_0_var(--color-cream)] ${block.style}`}
+        >
+          <div className="font-display text-3xl font-bold tabular-nums md:text-6xl">
+            {values[i] === null ? "--" : String(values[i]).padStart(2, "0")}
+          </div>
+          <div className="mt-0.5 text-[0.65rem] font-bold uppercase tracking-wider md:text-sm">
+            {block.label}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export default function CountdownTimer({ targetDate }: CountdownTimerProps) {
   const [timeLeft, setTimeLeft] = useState<TimeLeft | null>(null);
   const [hasMounted, setHasMounted] = useState(false);
@@ -45,41 +73,20 @@ export default function CountdownTimer({ targetDate }: CountdownTimerProps) {
   }, [targetDate]);
 
   if (!hasMounted) {
-    return (
-      <div className="flex justify-center gap-4 text-center">
-        {["Days", "Hours", "Minutes", "Seconds"].map((label) => (
-          <div key={label} className="bg-white/50 rounded-xl p-4 min-w-[80px]">
-            <div className="text-3xl font-bold text-rose-600">--</div>
-            <div className="text-sm text-rose-500">{label}</div>
-          </div>
-        ))}
-      </div>
-    );
+    return <Blocks values={[null, null, null, null]} />;
   }
 
   if (!timeLeft) {
     return (
-      <div className="text-2xl font-bold text-rose-600 text-center">
-        The celebration has begun!
+      <div className="text-center font-display text-3xl font-semibold text-cream">
+        The party has begun! 🎉
       </div>
     );
   }
 
   return (
-    <div className="flex justify-center gap-4 text-center">
-      {[
-        { value: timeLeft.days, label: "Days" },
-        { value: timeLeft.hours, label: "Hours" },
-        { value: timeLeft.minutes, label: "Minutes" },
-        { value: timeLeft.seconds, label: "Seconds" },
-      ].map(({ value, label }) => (
-        <div key={label} className="bg-white/50 rounded-xl p-4 min-w-[80px]">
-          <div className="text-3xl font-bold text-rose-600">
-            {value.toString().padStart(2, "0")}
-          </div>
-          <div className="text-sm text-rose-500">{label}</div>
-        </div>
-      ))}
-    </div>
+    <Blocks
+      values={[timeLeft.days, timeLeft.hours, timeLeft.minutes, timeLeft.seconds]}
+    />
   );
 }

@@ -13,6 +13,17 @@ const dummyImages = [
   { id: 6, src: "/photos/6.JPG", alt: "Photo 6" },
 ];
 
+// Each polaroid rests at its own slight angle with a strip of coloured tape.
+// Written out in full so Tailwind can see every class.
+const POLAROID_STYLES = [
+  { tilt: "-rotate-3", tape: "bg-coral/60" },
+  { tilt: "rotate-2", tape: "bg-sunny/70" },
+  { tilt: "-rotate-1", tape: "bg-mint/60" },
+  { tilt: "rotate-3", tape: "bg-grape/60" },
+  { tilt: "-rotate-2", tape: "bg-bubblegum/60" },
+  { tilt: "rotate-1", tape: "bg-sky/60" },
+];
+
 export default function ImageGallery() {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [mounted, setMounted] = useState(false);
@@ -59,27 +70,33 @@ export default function ImageGallery() {
 
   return (
     <>
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-        {dummyImages.map((image, index) => (
-          <div
-            key={image.id}
-            onClick={() => openLightbox(index)}
-            className="relative aspect-[3/4] rounded-xl overflow-hidden cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-xl group"
-          >
-            <Image
-              src={image.src}
-              alt={image.alt}
-              fill
-              className="object-cover transition-transform duration-500 group-hover:scale-110"
-              unoptimized
-            />
-            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 flex items-center justify-center">
-              <span className="text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-4xl">
-                🔍
-              </span>
-            </div>
-          </div>
-        ))}
+      <div className="grid grid-cols-2 gap-x-5 gap-y-8 md:grid-cols-3 md:gap-x-8 md:gap-y-10">
+        {dummyImages.map((image, index) => {
+          const style = POLAROID_STYLES[index % POLAROID_STYLES.length];
+          return (
+            <button
+              type="button"
+              key={image.id}
+              onClick={() => openLightbox(index)}
+              aria-label={`Open ${image.alt}`}
+              className={`group relative cursor-pointer rounded-md border-[3px] border-ink bg-white p-2 pb-8 shadow-[5px_5px_0_0_var(--color-ink)] transition-transform duration-300 hover:z-10 hover:rotate-0 hover:scale-[1.04] focus-visible:rotate-0 focus-visible:outline-[3px] focus-visible:outline-offset-4 focus-visible:outline-sky md:p-3 md:pb-12 ${style.tilt}`}
+            >
+              <span
+                aria-hidden="true"
+                className={`absolute -top-3 left-1/2 z-10 h-6 w-20 -translate-x-1/2 -rotate-6 border border-ink/20 ${style.tape}`}
+              />
+              <div className="relative aspect-[3/4] overflow-hidden rounded-sm border-2 border-ink">
+                <Image
+                  src={image.src}
+                  alt={image.alt}
+                  fill
+                  className="object-cover transition-transform duration-500 group-hover:scale-105"
+                  unoptimized
+                />
+              </div>
+            </button>
+          );
+        })}
       </div>
 
       {/* Lightbox - rendered via portal to escape transformed parents */}
