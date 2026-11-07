@@ -61,17 +61,17 @@ export default function PartyDetails({
 
   return (
     <section id="details" className="mx-auto mb-20 max-w-3xl scroll-mt-6 px-4">
-      <SectionHeading eyebrow="The details" title="Where & when" chip="sky" squiggle="sunny" />
+      <SectionHeading eyebrow="The details" title="Where & when" chip="sky" squiggle="periwinkle" />
 
       <div className="sticker p-5 md:p-8">
         <div className="grid gap-4 sm:grid-cols-2">
-          <InfoTile icon="📅" label="Date" tint="bg-coral/15">
+          <InfoTile icon="📅" label="Date" tint="bg-blush/25">
             {date}
           </InfoTile>
-          <InfoTile icon="⏰" label="Time" tint="bg-sunny/25">
+          <InfoTile icon="⏰" label="Time" tint="bg-ice/45">
             {time}
           </InfoTile>
-          <InfoTile icon="📍" label="Location" tint="bg-mint/20" className="sm:col-span-2">
+          <InfoTile icon="📍" label="Location" tint="bg-glacier/25" className="sm:col-span-2">
             {venue}
             {street && (
               <span className="block font-sans text-base text-ink/75">{street}</span>

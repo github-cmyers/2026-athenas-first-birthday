@@ -1,21 +1,30 @@
-// Single source of truth for when the party happens.
+// Single source of truth for when the party happens: Saturday, December 19th.
 //
-// TODO: set the real date and time of Athena's first birthday party. This is
-// still the naming ceremony's date, carried over when the site was reused.
+// TODO: confirm the start time - 4:00 PM is still a placeholder.
 //
-// The offset is explicit on purpose. A bare "2026-10-10T16:00:00" is parsed in
+// The offset is explicit on purpose. A bare "2026-12-19T16:00:00" is parsed in
 // whatever timezone the process happens to run in, so the same code produced
 // 4:00 PM on a developer machine in Eastern and noon Eastern inside the
-// production container, which runs UTC. Use -04:00 while EDT is in effect
-// (mid-March to early November) and -05:00 for EST the rest of the year.
-export const partyDate = new Date("2026-10-10T16:00:00-04:00");
+// production container, which runs UTC. -05:00 is EST, in effect on Dec 19;
+// use -04:00 for a date between mid-March and early November (EDT).
+export const partyDate = new Date("2026-12-19T16:00:00-05:00");
 
 export const PARTY_DURATION_HOURS = 3;
 
-// Whether guests can still submit an RSVP. When false the home page shows a
-// "closed" notice in place of the form; the form component and the RSVP API
-// are left intact so flipping this back is all it takes to reopen.
+// RSVPs close on their own when the party starts.
+export const RSVP_CLOSES_AT = partyDate;
+
+// Manual switch on top of the deadline: false closes RSVPs early. The form
+// component and the RSVP API are left intact so flipping this back is all it
+// takes to reopen (before the deadline).
 export const RSVP_OPEN = true;
+
+// Whether guests can submit an RSVP right now. Both the page (to choose form
+// or closed notice) and the API (to refuse late submissions from a page that
+// was left open past the deadline) ask this, so they can never disagree.
+export function isRsvpOpen(now: Date = new Date()): boolean {
+  return RSVP_OPEN && now < RSVP_CLOSES_AT;
+}
 
 // The most people one RSVP can count, the guest included. RSVPs cover the
 // guest's immediate family only - anyone else goes through the host first - so

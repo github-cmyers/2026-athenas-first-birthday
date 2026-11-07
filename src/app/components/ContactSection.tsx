@@ -13,14 +13,14 @@ export default function ContactSection({ name, phone, email }: ContactSectionPro
   return (
     <section className="mx-auto mb-16 max-w-3xl px-4 pt-6">
       <div className="sticker relative p-6 pt-10 text-center md:p-10">
-        <span className="chip absolute -top-4 left-1/2 -translate-x-1/2 -rotate-2 bg-mint">
+        <span className="chip absolute -top-4 left-1/2 -translate-x-1/2 -rotate-2 bg-glacier">
           Questions?
         </span>
         <p className="mb-5 text-lg text-ink/80">
           Feel free to reach out to {name} if you have any questions:
         </p>
         <div className="space-y-3">
-          <a href={phoneLink} className="btn-chunky bg-mint text-lg">
+          <a href={phoneLink} className="btn-chunky bg-glacier text-lg">
             <svg
               className="h-5 w-5"
               fill="none"

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { SnowCap } from "./decor";
 
 interface TimeLeft {
   days: number;
@@ -13,22 +14,25 @@ interface CountdownTimerProps {
   targetDate: Date;
 }
 
-// One baby block per unit, each its own colour and resting tilt.
+// One snow-capped block per unit, each its own colour and resting tilt.
 const BLOCKS = [
-  { label: "Days", style: "bg-coral -rotate-3" },
-  { label: "Hours", style: "bg-sunny rotate-2" },
-  { label: "Minutes", style: "bg-mint -rotate-2" },
-  { label: "Seconds", style: "bg-grape rotate-3" },
+  { label: "Days", style: "bg-blush -rotate-3" },
+  { label: "Hours", style: "bg-sky rotate-2" },
+  { label: "Minutes", style: "bg-glacier -rotate-2" },
+  { label: "Seconds", style: "bg-periwinkle rotate-3" },
 ] as const;
 
 function Blocks({ values }: { values: (number | null)[] }) {
   return (
-    <div className="mx-auto grid max-w-xl grid-cols-4 gap-3 md:gap-6">
+    <div className="mx-auto grid max-w-xl grid-cols-4 gap-3 pt-2 md:gap-6">
       {BLOCKS.map((block, i) => (
         <div
           key={block.label}
-          className={`flex aspect-square flex-col items-center justify-center rounded-2xl border-[3px] border-ink text-ink shadow-[5px_5px_0_0_var(--color-cream)] ${block.style}`}
+          className={`relative flex aspect-square flex-col items-center justify-center rounded-2xl border-[3px] border-ink text-ink shadow-[5px_5px_0_0_var(--color-snow)] ${block.style}`}
         >
+          {/* Offsets put the cap's outline on the block's top border line:
+              the outline sits 14/22 of the way down the cap. */}
+          <SnowCap className="absolute -top-3.5 left-3 right-3 h-5 md:top-[-17px] md:h-6" />
           <div className="font-display text-3xl font-bold tabular-nums md:text-6xl">
             {values[i] === null ? "--" : String(values[i]).padStart(2, "0")}
           </div>
@@ -78,7 +82,7 @@ export default function CountdownTimer({ targetDate }: CountdownTimerProps) {
 
   if (!timeLeft) {
     return (
-      <div className="text-center font-display text-3xl font-semibold text-cream">
+      <div className="text-center font-display text-3xl font-semibold text-snow">
         The party has begun! 🎉
       </div>
     );

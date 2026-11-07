@@ -1,51 +1,32 @@
 import { NextRequest, NextResponse } from "next/server";
 import { query } from "@/lib/db";
-import { ensureRsvpTable, RSVP_TABLE } from "@/lib/rsvp";
-import { MAX_FAMILY_MEMBERS } from "@/lib/event";
+import { ensureRsvpTable, parseRsvpInput, RSVP_TABLE, type RsvpRow } from "@/lib/rsvp";
+import { isRsvpOpen } from "@/lib/event";
+import { isAuthenticated } from "@/lib/adminSession";
 
 export async function POST(request: NextRequest) {
+  // A page left open past the deadline still shows the form, so the deadline
+  // is enforced here too. `closed` lets the form switch to the closed notice
+  // instead of showing a generic error.
+  if (!isRsvpOpen()) {
+    return NextResponse.json(
+      { error: "RSVPs are closed", closed: true },
+      { status: 403 }
+    );
+  }
+
   try {
+    const body = await request.json().catch(() => null);
+    const parsed = parseRsvpInput(body);
+    if (!parsed.ok) {
+      return NextResponse.json({ error: parsed.error }, { status: 400 });
+    }
+    const { name, familyMembers, phone, email, attending } = parsed.value;
+
     await ensureRsvpTable();
-
-    const body = await request.json();
-    const { name, familyMembers, phone, email, attending } = body;
-
-    if (!name || !phone || !email) {
-      return NextResponse.json(
-        { error: "Name, phone, and email are required" },
-        { status: 400 }
-      );
-    }
-
-    if (typeof attending !== "boolean") {
-      return NextResponse.json(
-        { error: "An attending response is required" },
-        { status: 400 }
-      );
-    }
-
-    // Someone who is not coming brings no one, whatever was sent. Anyone who
-    // is coming counts at least themselves, and is capped at the same limit
-    // the form offers - a request is not trusted to have come from the form.
-    const headcount = attending ? Number(familyMembers) : 0;
-
-    if (
-      attending &&
-      (!Number.isInteger(headcount) ||
-        headcount < 1 ||
-        headcount > MAX_FAMILY_MEMBERS)
-    ) {
-      return NextResponse.json(
-        {
-          error: `Number of attending family members must be between 1 and ${MAX_FAMILY_MEMBERS}`,
-        },
-        { status: 400 }
-      );
-    }
-
     await query(
       `INSERT INTO ${RSVP_TABLE} (Name, FamilyMembers, Phone, Email, Attending) VALUES ($1, $2, $3, $4, $5)`,
-      [name, headcount, phone, email, attending]
+      [name, familyMembers, phone, email, attending]
     );
 
     return NextResponse.json({ success: true });
@@ -58,18 +39,18 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function GET() {
+// The full guest list - names, phone numbers and emails - so admin only.
+// Public pages use /api/rsvp/count, which returns totals and nothing personal.
+export async function GET(request: NextRequest) {
+  if (!isAuthenticated(request)) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   try {
     await ensureRsvpTable();
-    const result = await query<{
-      id: number;
-      name: string;
-      familymembers: number;
-      phone: string;
-      email: string;
-      attending: boolean;
-      createdat: Date;
-    }>(`SELECT * FROM ${RSVP_TABLE} ORDER BY CreatedAt DESC`);
+    const result = await query<RsvpRow>(
+      `SELECT * FROM ${RSVP_TABLE} ORDER BY CreatedAt DESC`
+    );
 
     return NextResponse.json(result.rows);
   } catch (error) {

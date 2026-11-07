@@ -93,7 +93,7 @@ export default function AddToCalendar({
       <button
         onClick={() => setIsOpen(!isOpen)}
         aria-expanded={isOpen}
-        className="btn-chunky bg-sunny"
+        className="btn-chunky bg-ice"
       >
         <svg
           className="w-5 h-5"
@@ -134,7 +134,7 @@ export default function AddToCalendar({
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => setIsOpen(false)}
-              className="flex items-center gap-3 px-4 py-3 hover:bg-sunny/25 transition-colors text-ink font-semibold"
+              className="flex items-center gap-3 px-4 py-3 hover:bg-ice/40 transition-colors text-ink font-semibold"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24">
                 <path
@@ -162,7 +162,7 @@ export default function AddToCalendar({
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => setIsOpen(false)}
-              className="flex items-center gap-3 px-4 py-3 hover:bg-sunny/25 transition-colors text-ink font-semibold border-t-2 border-ink/10"
+              className="flex items-center gap-3 px-4 py-3 hover:bg-ice/40 transition-colors text-ink font-semibold border-t-2 border-ink/10"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24">
                 <path
@@ -175,7 +175,7 @@ export default function AddToCalendar({
 
             <button
               onClick={downloadICS}
-              className="flex items-center gap-3 px-4 py-3 hover:bg-sunny/25 transition-colors text-ink font-semibold border-t-2 border-ink/10 w-full text-left"
+              className="flex items-center gap-3 px-4 py-3 hover:bg-ice/40 transition-colors text-ink font-semibold border-t-2 border-ink/10 w-full text-left"
             >
               <svg className="w-5 h-5 text-ink/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path

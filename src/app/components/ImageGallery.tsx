@@ -16,11 +16,11 @@ const dummyImages = [
 // Each polaroid rests at its own slight angle with a strip of coloured tape.
 // Written out in full so Tailwind can see every class.
 const POLAROID_STYLES = [
-  { tilt: "-rotate-3", tape: "bg-coral/60" },
-  { tilt: "rotate-2", tape: "bg-sunny/70" },
-  { tilt: "-rotate-1", tape: "bg-mint/60" },
-  { tilt: "rotate-3", tape: "bg-grape/60" },
-  { tilt: "-rotate-2", tape: "bg-bubblegum/60" },
+  { tilt: "-rotate-3", tape: "bg-blush/70" },
+  { tilt: "rotate-2", tape: "bg-ice/80" },
+  { tilt: "-rotate-1", tape: "bg-glacier/70" },
+  { tilt: "rotate-3", tape: "bg-periwinkle/70" },
+  { tilt: "-rotate-2", tape: "bg-berry/50" },
   { tilt: "rotate-1", tape: "bg-sky/60" },
 ];
 

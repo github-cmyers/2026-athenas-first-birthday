@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { HOST, MAX_FAMILY_MEMBERS, telHref } from "@/lib/event";
+import { MAX_FAMILY_MEMBERS } from "@/lib/event";
 import { BG, PARTY_COLORS } from "./decor";
+import RSVPClosed from "./RSVPClosed";
 
 // Shared look for the text inputs and the select: a soft outline at rest that
 // firms up to full ink with a sky glow when focused.
@@ -139,7 +140,7 @@ function AttendanceChoice({
       value: false,
       icon: "💌",
       label: "Regretfully declines",
-      highlight: "peer-checked:bg-bubblegum/35",
+      highlight: "peer-checked:bg-blush/45",
     },
   ];
 
@@ -196,7 +197,8 @@ function SuccessMessage({
 }) {
   return (
     <div className="success-container sticker relative overflow-hidden p-8 text-center">
-      {/* Confetti shower - celebratory only for acceptances */}
+      {/* Confetti shower in the winter palette - celebratory only for
+          acceptances */}
       {attending && (
         <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
           {CONFETTI_PIECES.map((piece, i) => (
@@ -215,7 +217,7 @@ function SuccessMessage({
 
       {/* Main content with staggered animations */}
       <div className="relative z-10">
-        <div className="icon-pop mb-4 text-6xl">{attending ? "🎈" : "💌"}</div>
+        <div className="icon-pop mb-4 text-6xl">{attending ? "☃️" : "💌"}</div>
         <h3 className="title-slide mb-3 font-display text-4xl font-bold text-ink">
           Thank You!
         </h3>
@@ -303,6 +305,7 @@ export default function RSVPForm() {
   });
   const [attending, setAttending] = useState(true);
   const [submitted, setSubmitted] = useState(false);
+  const [closed, setClosed] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -323,7 +326,19 @@ export default function RSVPForm() {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to submit RSVP");
+        const data = await response.json().catch(() => ({}));
+        // The deadline passed while this page was open.
+        if (data.closed) {
+          setClosed(true);
+          return;
+        }
+        // Validation messages from the server are written for guests.
+        setError(
+          response.status === 400 && data.error
+            ? data.error
+            : "Something went wrong. Please try again."
+        );
+        return;
       }
 
       setSubmitted(true);
@@ -347,6 +362,10 @@ export default function RSVPForm() {
 
   if (submitted) {
     return <SuccessMessage name={formData.name} attending={attending} />;
+  }
+
+  if (closed) {
+    return <RSVPClosed />;
   }
 
   return (
@@ -378,44 +397,25 @@ export default function RSVPForm() {
           The count includes the guest themselves, so the smallest answer is 1
           and nobody has to work out whether to count themselves. */}
       {attending && (
-        <div className="space-y-3">
-          <div>
-            <FloatingSelect
-              id="familyMembers"
-              name="familyMembers"
-              label="Number of your attending family members"
-              value={formData.familyMembers}
-              onChange={handleChange}
-              disabled={loading}
-              describedBy="familyMembers-hint familyMembers-note"
-              options={Array.from({ length: MAX_FAMILY_MEMBERS }, (_, i) => {
-                const num = i + 1;
-                return {
-                  value: String(num),
-                  label: num === 1 ? "1 (just me)" : String(num),
-                };
-              })}
-            />
-            <p id="familyMembers-hint" className="mt-1.5 px-1 text-sm text-ink/60">
-              Please include yourself in this number.
-            </p>
-          </div>
-
-          <p
-            id="familyMembers-note"
-            className="rounded-2xl border-[2.5px] border-dashed border-coral bg-coral/10 px-4 py-3 text-sm text-ink"
-          >
-            <span className="font-bold">
-              Bringing someone outside your immediate family?
-            </span>{" "}
-            Please reach out to {HOST.firstName} at{" "}
-            <a
-              href={telHref(HOST.phone)}
-              className="font-bold underline decoration-2 underline-offset-2"
-            >
-              {HOST.phone}
-            </a>{" "}
-            beforehand.
+        <div>
+          <FloatingSelect
+            id="familyMembers"
+            name="familyMembers"
+            label="Number of your attending family members"
+            value={formData.familyMembers}
+            onChange={handleChange}
+            disabled={loading}
+            describedBy="familyMembers-hint"
+            options={Array.from({ length: MAX_FAMILY_MEMBERS }, (_, i) => {
+              const num = i + 1;
+              return {
+                value: String(num),
+                label: num === 1 ? "1 (just me)" : String(num),
+              };
+            })}
+          />
+          <p id="familyMembers-hint" className="mt-1.5 px-1 text-sm text-ink/60">
+            Please include yourself in this number.
           </p>
         </div>
       )}
@@ -445,7 +445,7 @@ export default function RSVPForm() {
       <button
         type="submit"
         disabled={loading}
-        className="btn-chunky w-full bg-coral py-4 text-xl"
+        className="btn-chunky w-full bg-blush py-4 text-xl"
       >
         {loading
           ? "Submitting..."

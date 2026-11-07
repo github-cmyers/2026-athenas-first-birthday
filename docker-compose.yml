@@ -25,6 +25,8 @@ services:
       - "3002:3000"
     environment:
       - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/first_birthday
+      # Public address of the site, used for link previews (og:image).
+      # - SITE_URL=https://your-domain.example
     depends_on:
       postgres:
         condition: service_healthy

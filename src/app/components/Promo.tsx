@@ -12,22 +12,22 @@ export default function Promo({ phone, email }: PromoProps) {
 
   return (
     <section className="mx-auto mb-16 max-w-3xl px-4">
-      <div className="relative overflow-hidden rounded-[1.75rem] border-[3px] border-ink bg-ink shadow-[6px_6px_0_0_var(--color-grape)]">
+      <div className="relative overflow-hidden rounded-[1.75rem] border-[3px] border-ink bg-ink shadow-[6px_6px_0_0_var(--color-periwinkle)]">
         {/* Decorative elements */}
         <div aria-hidden="true" className="absolute inset-0 overflow-hidden">
-          <div className="absolute -right-20 -top-20 h-56 w-56 rounded-full bg-grape/25" />
-          <div className="absolute -bottom-24 -left-16 h-56 w-56 rounded-full bg-coral/20" />
+          <div className="absolute -right-20 -top-20 h-56 w-56 rounded-full bg-periwinkle/25" />
+          <div className="absolute -bottom-24 -left-16 h-56 w-56 rounded-full bg-blush/20" />
           <div className="absolute left-5 top-5 text-4xl opacity-30">💻</div>
           <div className="absolute bottom-5 right-5 text-4xl opacity-30">✨</div>
         </div>
 
         {/* Content */}
         <div className="relative p-8 text-center md:p-10">
-          <span className="chip mb-5 rotate-2 border-cream bg-sunny shadow-none">
+          <span className="chip mb-5 rotate-2 border-snow bg-ice shadow-none">
             Colin&apos;s Side Hustle
           </span>
 
-          <h2 className="mb-6 font-display text-xl font-medium leading-snug text-cream md:text-2xl">
+          <h2 className="mb-6 font-display text-xl font-medium leading-snug text-snow md:text-2xl">
             This website was built by Ethan &amp; Athena&apos;s Dad. If
             you&apos;re interested in me building you one of your own tailored
             exactly to your needs at a fair price, feel free to reach out.
@@ -36,7 +36,7 @@ export default function Promo({ phone, email }: PromoProps) {
           {/* CTA Button */}
           <a
             href={phoneLink}
-            className="btn-chunky group border-cream bg-white text-lg shadow-[4px_4px_0_0_var(--color-sunny)] hover:shadow-[6px_6px_0_0_var(--color-sunny)]"
+            className="btn-chunky group border-snow bg-white text-lg shadow-[4px_4px_0_0_var(--color-ice)] hover:shadow-[6px_6px_0_0_var(--color-ice)]"
           >
             <svg
               className="h-6 w-6 group-hover:animate-bounce"

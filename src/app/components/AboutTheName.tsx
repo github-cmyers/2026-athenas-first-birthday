@@ -10,7 +10,7 @@ interface AboutTheNameProps {
 export default function AboutTheName({ name, origin, meaning, reason }: AboutTheNameProps) {
   return (
     <section className="mx-auto mb-20 max-w-3xl px-4">
-      <SectionHeading eyebrow="Her name" title={`Why ${name}?`} chip="grape" squiggle="mint" />
+      <SectionHeading eyebrow="Her name" title={`Why ${name}?`} chip="periwinkle" squiggle="glacier" />
 
       <div className="sticker bg-lilac p-6 md:flex md:items-center md:gap-10 md:p-10">
         <div className="text-center md:w-1/3 md:shrink-0">

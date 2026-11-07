@@ -44,7 +44,7 @@ export default function GuestCount() {
 
   if (isLoading) {
     return (
-      <div className="mb-8 text-center">
+      <div className="mb-12 text-center">
         <div className={`${BADGE} animate-pulse`}>
           <span className="invisible font-display text-lg">Loading...</span>
         </div>
@@ -54,10 +54,10 @@ export default function GuestCount() {
 
   if (!counts || counts.guests === 0) {
     return (
-      <div className="mb-8 text-center">
+      <div className="mb-12 text-center">
         <div className={BADGE}>
           <span className="font-display text-lg font-semibold">
-            🎈 Be the first to RSVP!
+            ❄️ Be the first to RSVP!
           </span>
         </div>
       </div>
@@ -65,7 +65,7 @@ export default function GuestCount() {
   }
 
   return (
-    <div className="mb-8 text-center">
+    <div className="mb-12 text-center">
       <div className={BADGE}>
         <div className="flex items-center justify-center gap-3">
           <span className="text-3xl" aria-hidden="true">🎉</span>

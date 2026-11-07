@@ -7,24 +7,25 @@
   --font-display: var(--font-fredoka), ui-rounded, system-ui, sans-serif;
 }
 
-/* Birthday palette. Text sits in ink on every colour here - white on these
-   brights is too low-contrast to read comfortably. */
+/* Winter ONEderland palette. Text sits in midnight ink on every colour here;
+   white on these pastels is too low-contrast to read comfortably. Gold is a
+   small warm accent only (the owl's beak and feet). */
 @theme {
-  --color-ink: #2b1d4e;
-  --color-cream: #fff8ec;
-  --color-lilac: #efe9ff;
-  --color-coral: #ff6b5e;
-  --color-sunny: #ffc93c;
-  --color-mint: #4fd1c5;
-  --color-grape: #a78bfa;
-  --color-bubblegum: #ff8fb1;
-  --color-sky: #6ec3f4;
+  --color-ink: #1f2a52;
+  --color-snow: #f5f9ff;
+  --color-lilac: #eceaff;
+  --color-blush: #f9b4cf;
+  --color-berry: #ec6f9c;
+  --color-ice: #bfe3fb;
+  --color-sky: #74b9ee;
+  --color-glacier: #92e0dd;
+  --color-periwinkle: #b3b5f7;
+  --color-gold: #f6c56b;
 
   --animate-float: float 6s ease-in-out infinite;
   --animate-sway: sway 3.2s ease-in-out infinite;
   --animate-wobble: wobble 4s ease-in-out infinite;
   --animate-bob: bob 2.6s ease-in-out infinite;
-  --animate-drift: drift 8s ease-in-out infinite;
 
   @keyframes float {
     0%, 100% { transform: translateY(0) rotate(-3deg); }
@@ -42,10 +43,6 @@
     0%, 100% { transform: translateY(0); }
     50% { transform: translateY(-10px); }
   }
-  @keyframes drift {
-    0%, 100% { transform: translateY(0) rotate(0deg); }
-    50% { transform: translateY(-14px) rotate(180deg); }
-  }
 }
 
 html {
@@ -55,24 +52,45 @@ html {
 /* The invitation is designed as a single light theme on purpose, so the page
    reads the same whatever the guest's system setting is. */
 body {
-  background-color: var(--color-cream);
+  background-color: var(--color-snow);
   color: var(--color-ink);
 }
 
 @layer components {
-  /* Cream with scattered sprinkles, drawn as one repeating SVG tile. */
-  .sprinkles {
-    background-color: var(--color-cream);
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cg opacity='.4'%3E%3Crect x='20' y='30' width='18' height='6' rx='3' fill='%23ff6b5e' transform='rotate(35 29 33)'/%3E%3Crect x='150' y='24' width='18' height='6' rx='3' fill='%234fd1c5' transform='rotate(-20 159 27)'/%3E%3Crect x='96' y='96' width='18' height='6' rx='3' fill='%23a78bfa' transform='rotate(70 105 99)'/%3E%3Crect x='190' y='140' width='18' height='6' rx='3' fill='%23ffc93c' transform='rotate(15 199 143)'/%3E%3Crect x='36' y='170' width='18' height='6' rx='3' fill='%236ec3f4' transform='rotate(-45 45 173)'/%3E%3Crect x='126' y='196' width='18' height='6' rx='3' fill='%23ff8fb1' transform='rotate(60 135 199)'/%3E%3Ccircle cx='72' cy='118' r='4' fill='%23ffc93c'/%3E%3Ccircle cx='212' cy='78' r='3.5' fill='%23ff6b5e'/%3E%3Ccircle cx='140' cy='150' r='3' fill='%234fd1c5'/%3E%3Ccircle cx='14' cy='98' r='3' fill='%23ff8fb1'/%3E%3Ccircle cx='176' cy='214' r='3' fill='%23a78bfa'/%3E%3Ccircle cx='58' cy='224' r='3' fill='%236ec3f4'/%3E%3C/g%3E%3C/svg%3E");
+  /* Snow-white with scattered snowflakes, drawn as one repeating SVG tile. */
+  .snowy {
+    background-color: var(--color-snow);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cg fill='none' stroke-width='1.6' stroke-linecap='round' opacity='.45'%3E%3Cpath stroke='%2374b9ee' d='M0-7V7M-6.1-3.5L6.1 3.5M-6.1 3.5L6.1-3.5' transform='translate(36 40)'/%3E%3Cpath stroke='%23b3b5f7' d='M0-7V7M-6.1-3.5L6.1 3.5M-6.1 3.5L6.1-3.5' transform='translate(168 28) scale(.8)'/%3E%3Cpath stroke='%23f9b4cf' d='M0-7V7M-6.1-3.5L6.1 3.5M-6.1 3.5L6.1-3.5' transform='translate(110 112) scale(1.1)'/%3E%3Cpath stroke='%2392e0dd' d='M0-7V7M-6.1-3.5L6.1 3.5M-6.1 3.5L6.1-3.5' transform='translate(204 150) scale(.7)'/%3E%3Cpath stroke='%2374b9ee' d='M0-7V7M-6.1-3.5L6.1 3.5M-6.1 3.5L6.1-3.5' transform='translate(52 186) scale(.9)'/%3E%3Cpath stroke='%23b3b5f7' d='M0-7V7M-6.1-3.5L6.1 3.5M-6.1 3.5L6.1-3.5' transform='translate(150 212) scale(.6)'/%3E%3C/g%3E%3Cg opacity='.45'%3E%3Ccircle cx='90' cy='60' r='2.5' fill='%2374b9ee'/%3E%3Ccircle cx='212' cy='86' r='2' fill='%23f9b4cf'/%3E%3Ccircle cx='20' cy='120' r='2' fill='%23b3b5f7'/%3E%3Ccircle cx='160' cy='160' r='2.5' fill='%2392e0dd'/%3E%3Ccircle cx='100' cy='220' r='2' fill='%2374b9ee'/%3E%3Ccircle cx='230' cy='228' r='1.8' fill='%23b3b5f7'/%3E%3C/g%3E%3C/svg%3E");
   }
 
   /* The core card: thick ink outline with a hard offset shadow, like a
      sticker. Background colour utilities override the white. */
   .sticker {
+    position: relative;
     background-color: #fff;
     border: 3px solid var(--color-ink);
     border-radius: 1.75rem;
     box-shadow: 6px 6px 0 0 var(--color-ink);
+  }
+
+  /* Uneven mounds of snow piled along the top edge of every card. The tile's
+     baseline (y = 24) is the top of the card's border, so the snow sits on
+     the border line rather than covering it - otherwise white snow on a
+     white card just reads as a wavy edge. Each tile ends in a short bare
+     stretch so the drift breaks into clumps, and the mounds shade from white
+     to pale ice at their base so they read as snow against the pale page.
+     Cards that clip their overflow simply don't show it. */
+  .sticker::before {
+    content: "";
+    position: absolute;
+    top: -27px;
+    left: 24px;
+    right: 24px;
+    height: 28px;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='28' viewBox='0 0 300 28'%3E%3Cdefs%3E%3ClinearGradient id='s' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='.3' stop-color='%23fff'/%3E%3Cstop offset='1' stop-color='%23bfe3fb'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath fill='url(%23s)' stroke='%231f2a52' stroke-width='3' stroke-linejoin='round' d='M0 24C8 24 10 12 26 12C40 12 44 19 54 19C64 19 70 6 92 6C112 6 118 20 132 20C142 20 148 14 160 14C174 14 178 21 192 21C204 21 210 9 232 9C254 9 262 24 276 24Z'/%3E%3C/svg%3E");
+    background-repeat: round no-repeat;
+    background-size: auto 100%;
   }
 
   .chip {
@@ -137,11 +155,40 @@ body {
     paint-order: stroke fill;
     text-shadow: 0.05em 0.05em 0 var(--color-ink);
   }
+
+  /* Falling snow. Each column is as tall as the snowing area and slides from
+     one height above it to resting on its floor, so a translateY percentage
+     (which is relative to the column, i.e. the area) carries the flake from
+     top to bottom at any section height. The flake drifts sideways on its
+     own, independent animation. */
+  .snowfall-column {
+    position: absolute;
+    top: 0;
+    width: 0;
+    height: 100%;
+    animation: snowfall linear infinite;
+  }
+  .snowfall-flake {
+    position: absolute;
+    bottom: 0;
+    animation: snow-sway ease-in-out infinite alternate;
+  }
+}
+
+@keyframes snowfall {
+  from { transform: translateY(-100%); }
+  to { transform: translateY(0); }
+}
+
+@keyframes snow-sway {
+  from { transform: translateX(-12px); }
+  to { transform: translateX(12px); }
 }
 
 /* Decorative motion is a nice-to-have; respect guests who have asked their
    system for less of it. The !important also beats AnimatedSection's inline
-   transitions, so sections simply appear. */
+   transitions, so sections simply appear. Falling snow is hidden outright -
+   frozen mid-fall it would just pile up along the bottom edge. */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -150,5 +197,8 @@ body {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+  .snowfall {
+    display: none;
   }
 }

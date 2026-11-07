@@ -11,7 +11,7 @@ export default function Footer() {
       <p className="mt-4 px-4 font-display text-2xl font-semibold text-ink md:text-3xl">
         We can&apos;t wait to celebrate with you!
       </p>
-      <div className="mt-2 text-2xl" aria-hidden="true">🎈 🎂 🎉</div>
+      <div className="mt-2 text-2xl" aria-hidden="true">❄️ 🎂 ☃️</div>
     </footer>
   );
 }
