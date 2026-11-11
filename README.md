@@ -13,7 +13,7 @@ These still need real details or a final check:
 - [ ] **Day-of schedule.** `PARTY_SCHEDULE` in [src/lib/event.ts](src/lib/event.ts) is a draft. Replace it with the real plan, in English and French.
 - [ ] **Prediction questions.** The four questions and their answers in [src/lib/predictions.ts](src/lib/predictions.ts) are a first draft. Settle them before RSVPs start coming in (see [Predictions for Athena](#predictions-for-athena)).
 - [ ] **French wording.** Have a fluent speaker read the French in [src/lib/i18n.ts](src/lib/i18n.ts) and [src/lib/predictions.ts](src/lib/predictions.ts).
-- [ ] **Production settings.** Set `SITE_URL` and `ADMIN_PASSWORD` on the server (see [Configuration](#configuration)).
+- [x] **Production settings.** `SITE_URL` and `ADMIN_PASSWORD` are set on Railway (see [Production](#production-railway)).
 - [ ] **Printed invitations.** Print them from the live site, so the QR code points at the real address.
 
 ## Features
@@ -174,6 +174,16 @@ The site runs on <http://localhost:3002>, with PostgreSQL in its own container a
       - ADMIN_PASSWORD=${ADMIN_PASSWORD}
       - SITE_URL=${SITE_URL}
 ```
+
+## Production (Railway)
+
+The live site is <https://2026-athenas-first-birthday-production.up.railway.app>. It's set up the same way as the naming-ceremony site:
+
+- **Railway project `2026-athenas-first-birthday`** has one service, also named `2026-athenas-first-birthday`. It builds the `Dockerfile` from this repo's `main` branch, so **every push to `main` deploys automatically**.
+- **The database is shared with the naming ceremony.** It's the PostgreSQL service in the Railway project `selfless-passion`, reached through its public address with SSL. Each site has its own table, so the guest lists stay separate.
+- **Variables** on the service: `DATABASE_URL` (the shared database's public URL), `DATABASE_SSL=true`, `ADMIN_PASSWORD` and `SITE_URL`. Change them in the Railway dashboard under the service's **Variables** tab, or with `railway variables --set "NAME=value"`. Railway redeploys after each change.
+
+If you add a custom domain, update `SITE_URL` to match, so link previews and the printed invitation's QR code use it.
 
 ## Data
 
