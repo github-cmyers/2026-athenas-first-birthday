@@ -102,6 +102,18 @@ export function formatEventDate(date: Date, lang: Lang = "en"): string {
   return `${part("month")} ${day}${ordinalSuffix(day)}, ${part("year")}`;
 }
 
+// e.g. "December 19th", or "19 décembre" in French
+export function formatEventMonthDay(date: Date, lang: Lang = "en"): string {
+  if (lang === "fr") {
+    return new Intl.DateTimeFormat("fr-FR", {
+      timeZone: EVENT_TIME_ZONE,
+      day: "numeric",
+      month: "long",
+    }).format(date);
+  }
+  return formatEventDate(date, "en").replace(/, \d{4}$/, "");
+}
+
 // e.g. "4:00 PM", or "16:00" in French
 export function formatEventTime(date: Date, lang: Lang = "en"): string {
   return new Intl.DateTimeFormat(lang === "fr" ? "fr-FR" : "en-US", {

@@ -25,7 +25,7 @@ These still need real details or a final check:
 - **Predictions for Athena.** Right after replying, guests are asked four fun questions about Athena's future, picking as many answers as they like. Everyone's predictions are revealed on party day (see [Predictions for Athena](#predictions-for-athena)).
 - **Countdown** to the start of the party.
 - **Where & when.** Date, time and venue, a map, and "Add to Calendar" for Google Calendar, Outlook or an `.ics` file (Apple and others).
-- **Party-day forecast.** Appears 14 days before the party, with conditions, temperatures, chance of rain or snow, and a tip when it's snowy or cold.
+- **Weather.** Until 2 weeks before the party, a "Snow Prediction" gives the odds of snow from 30 years of weather history. After that, a live party-day forecast shows conditions, temperatures, the chance of rain or snow, and a tip when it's snowy or cold (see [Weather](#weather)).
 - **Party-day and thank-you modes.** The page changes on its own on the day and after the party (see [How the page changes](#how-the-page-changes-around-the-party)).
 - **English and French.** A toggle in the corner switches languages (see [Languages](#languages)).
 - **Photo gallery** of polaroids, opening into a full-screen viewer.
@@ -45,7 +45,7 @@ Almost everything about the party lives in one file, [src/lib/event.ts](src/lib/
 | --- | --- | --- |
 | Date and start time | `partyDate` | Write the time with its UTC offset: `-05:00` in winter (EST), `-04:00` from mid-March to early November (EDT). Everything else, including the countdown, the calendar invite, the preview image and RSVP closing, follows from this. |
 | Party length | `PARTY_DURATION_HOURS` | Sets the calendar event's end and when the thank-you mode begins. |
-| Venue | `VENUE` | The address is shown on the page, the map, the calendar invite and the printed card. `latitude`/`longitude` only feed the forecast, so the town's coordinates are enough. |
+| Venue | `VENUE` | The address is shown on the page, the map, the calendar invite and the printed card. `latitude`/`longitude` only feed the weather, so the town's coordinates are enough. If the town changes, also recompute the snow prediction (see [Weather](#weather)). |
 | Host contact | `HOST` | Shown in the "Questions?" section. |
 | RSVPs open/closed | `RSVP_OPEN` | RSVPs close by themselves when the party starts. Set this to `false` to close them early. |
 | Most people per RSVP | `MAX_FAMILY_MEMBERS` | Used by both the form and the server. |
@@ -65,7 +65,7 @@ The phase comes from the clock in Eastern time:
 
 | Phase | When | What guests see |
 | --- | --- | --- |
-| Upcoming | Until the day of the party | The invitation, countdown, details, forecast (from 14 days out) and the RSVP form. |
+| Upcoming | Until the day of the party | The invitation, countdown, details with the weather, and the RSVP form. |
 | Party day | From midnight on December 19 until the party ends | "Today's the day!" and the day's schedule at the top, with the current item highlighted. Everyone's predictions are revealed. RSVPs close at the start time. |
 | After | Once the party is over | A thank-you note replaces the invitation, and the predictions stay up. The countdown, details and RSVP section are hidden. |
 
@@ -92,13 +92,18 @@ When an RSVP goes through, a pop-up asks four questions, such as "When she grows
 - **Changing the questions.** Edit `PREDICTION_QUESTIONS` in [src/lib/predictions.ts](src/lib/predictions.ts). Each question and answer has English and French text, an icon, and an `id`. Votes are stored by `id`, so you can reword an answer freely. Changing or removing an `id` drops the votes already cast for it, so settle the list before guests start answering.
 - **Only the guest can add them.** Each RSVP reply gives the guest's browser a one-time key, and predictions can only be attached to the RSVP that key came with. Guests who replied before this feature existed weren't asked.
 
-## Weather forecast
+## Weather
 
-The forecast comes from [Open-Meteo](https://open-meteo.com/), which is free and needs no account. The site credits it under the forecast, as its licence requires.
+The weather tile in "Where & when" is always shown until the party is over. Its data comes from [Open-Meteo](https://open-meteo.com/), which is free and needs no account. The site credits it under the tile, as its licence requires.
 
-- It appears 14 days before the party and disappears once the party is over.
-- Results are reused for an hour, so guests' visits don't each call the service.
-- If the service is slow (over 4 seconds) or down, the tile simply doesn't show. The rest of the page never waits for it.
+- **More than 2 weeks out: "Snow Prediction".** The odds of snow, the typical high and low, and the biggest snowfall on the date, all from 30 years of weather history at the venue's town. For December 19 in North Providence, that's about a 1 in 7 chance of snow, a typical high of 40°F and low of 27°F, and 6" in 2008.
+- **The last 2 weeks: "Party-day forecast".** The live forecast. Results are reused for an hour, so guests' visits don't each call the service. If the service is slow (over 4 seconds) or down, the tile shows the snow prediction instead. The rest of the page never waits for it.
+
+The snow prediction's numbers are stored in `SNOW_HISTORY` in [src/lib/forecast.ts](src/lib/forecast.ts), because Open-Meteo's history service takes a minute or more to answer. If the party date or the venue's town changes, recompute them and paste the output over the old values:
+
+```bash
+node scripts/snow-history.mjs 41.85 -71.47 12-19   # latitude, longitude, month-day
+```
 
 ## Printable invitation
 
@@ -232,11 +237,13 @@ src/
     lang.ts                works out each visitor's language
     rsvp.ts                RSVP table and validation
     predictions.ts         prediction questions, validation and vote counts
-    forecast.ts            Open-Meteo forecast
+    forecast.ts            live forecast and the stored snow prediction
     csv.ts                 CSV export
     site.ts                the site's public address
     adminSession.ts        signed admin logins
     db.ts                  PostgreSQL connection
+scripts/
+  snow-history.mjs         recomputes the snow prediction from weather history
 ```
 
 ## Checking changes

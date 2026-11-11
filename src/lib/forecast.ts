@@ -7,9 +7,30 @@ import {
 } from "./event";
 
 // Party-day weather from Open-Meteo: free, no API key, CC BY 4.0 (the card
-// credits it). Forecasts reach about 16 days ahead; the card appears 14 days
-// out to stay safely inside that range.
+// credits it). Forecasts reach about 16 days ahead; the live forecast is used
+// from 14 days out to stay safely inside that range. Before then, the card
+// shows a "Snow Prediction" from weather history instead.
 const FORECAST_RANGE_DAYS = 14;
+
+// What 30 years of weather history say about the party date at the venue,
+// from Open-Meteo's historical archive (ERA5). Worked out once and kept here
+// rather than fetched per visit: the archive takes a minute or more to answer,
+// and the past doesn't change.
+//
+// chancePercent: share of days within 3 days of Dec 19 with at least 0.1" of
+// snow. typicalHigh/Low: median °F over the same days. biggest: the largest
+// snowfall on Dec 19 itself.
+//
+// Recompute with scripts/snow-history.mjs if the date or the venue's town
+// changes.
+export const SNOW_HISTORY = {
+  years: 30,
+  lastYear: 2025,
+  chancePercent: 14,
+  typicalHigh: 40,
+  typicalLow: 27,
+  biggest: { year: 2008, inches: 6.3 } as { year: number; inches: number } | null,
+};
 
 export interface PartyForecast {
   code: number; // WMO weather code for the day
@@ -78,14 +99,10 @@ export function parseForecast(data: OpenMeteoResponse): PartyForecast | null {
   };
 }
 
-// Null whenever there is nothing worth showing: the party is too far off for
-// a forecast, already over, or the weather service is slow or down. The page
+// The live forecast, or null if the weather service is slow or down. The page
 // never waits more than a few seconds on it, and a result is reused for an
 // hour so guests' visits don't each call the service.
-export async function getPartyForecast(now: Date = new Date()): Promise<PartyForecast | null> {
-  const daysAway = (partyDate.getTime() - now.getTime()) / (24 * 60 * 60 * 1000);
-  if (daysAway > FORECAST_RANGE_DAYS || now >= PARTY_END) return null;
-
+async function fetchPartyForecast(): Promise<PartyForecast | null> {
   try {
     const res = await fetch(forecastUrl(), {
       next: { revalidate: 3600 },
@@ -96,4 +113,24 @@ export async function getPartyForecast(now: Date = new Date()): Promise<PartyFor
   } catch {
     return null;
   }
+}
+
+export type PartyWeather =
+  | { kind: "forecast"; forecast: PartyForecast }
+  // `forecastSoon`: the live forecast hasn't started yet (as opposed to
+  // being in range but unreachable right now).
+  | { kind: "history"; forecastSoon: boolean };
+
+// What the weather card shows: the live forecast from 14 days out, and the
+// snow prediction from history before that - or whenever the live forecast
+// can't be reached, so the card is always there. Null only once the party is
+// over.
+export async function getPartyWeather(now: Date = new Date()): Promise<PartyWeather | null> {
+  if (now >= PARTY_END) return null;
+
+  const daysAway = (partyDate.getTime() - now.getTime()) / (24 * 60 * 60 * 1000);
+  if (daysAway > FORECAST_RANGE_DAYS) return { kind: "history", forecastSoon: true };
+
+  const forecast = await fetchPartyForecast();
+  return forecast ? { kind: "forecast", forecast } : { kind: "history", forecastSoon: false };
 }

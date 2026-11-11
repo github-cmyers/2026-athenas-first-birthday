@@ -1,5 +1,5 @@
-import { getPartyForecast } from "@/lib/forecast";
-import { formatEventTime, partyDate } from "@/lib/event";
+import { getPartyWeather, SNOW_HISTORY, type PartyForecast as Forecast } from "@/lib/forecast";
+import { formatEventMonthDay, formatEventTime, partyDate } from "@/lib/event";
 import { getMessages, type Lang, type Messages } from "@/lib/i18n";
 
 type Condition = keyof Messages["forecast"]["conditions"];
@@ -21,13 +21,57 @@ function describe(code: number): { icon: string; condition: Condition } {
   return { icon: "☁️", condition: "cloudy" };
 }
 
-// The forecast tile in "Where & when". Renders nothing until the party is
-// within forecast range, or if the weather service can't be reached.
+// The weather tile in "Where & when", shown until the party is over: the live
+// forecast from 2 weeks out, and a snow prediction from weather history
+// before that (or whenever the live forecast can't be reached).
 export default async function PartyForecast({ lang }: { lang: Lang }) {
-  const forecast = await getPartyForecast();
-  if (!forecast) return null;
+  const weather = await getPartyWeather();
+  if (!weather) return null;
 
   const t = getMessages(lang).forecast;
+  return weather.kind === "forecast" ? (
+    <LiveForecast t={t} lang={lang} forecast={weather.forecast} />
+  ) : (
+    <SnowPrediction t={t} lang={lang} forecastSoon={weather.forecastSoon} />
+  );
+}
+
+function WeatherTile({
+  t,
+  icon,
+  label,
+  children,
+}: {
+  t: Messages["forecast"];
+  icon: string;
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="flex items-start gap-4 rounded-2xl border-[2.5px] border-ink bg-periwinkle/20 p-4 text-left sm:col-span-2">
+      <span
+        aria-hidden="true"
+        className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border-[2.5px] border-ink bg-white text-2xl"
+      >
+        {icon}
+      </span>
+      <div>
+        <div className="text-xs font-bold uppercase tracking-wider text-ink/60">{label}</div>
+        {children}
+        <a
+          href="https://open-meteo.com/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-1 inline-block text-xs text-ink/50 underline-offset-2 hover:underline"
+        >
+          {t.source}
+        </a>
+      </div>
+    </div>
+  );
+}
+
+function LiveForecast({ t, lang, forecast }: { t: Messages["forecast"]; lang: Lang; forecast: Forecast }) {
   const { icon, condition } = describe(forecast.code);
   const snowy = condition === "snow" || condition === "snowShowers" || forecast.snowInches >= 0.1;
   const cold = (forecast.atStart ?? forecast.high) < 40;
@@ -42,29 +86,40 @@ export default async function PartyForecast({ lang }: { lang: Lang }) {
   ].filter(Boolean);
 
   return (
-    <div className="flex items-start gap-4 rounded-2xl border-[2.5px] border-ink bg-periwinkle/20 p-4 text-left sm:col-span-2">
-      <span
-        aria-hidden="true"
-        className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border-[2.5px] border-ink bg-white text-2xl"
-      >
-        {icon}
-      </span>
-      <div>
-        <div className="text-xs font-bold uppercase tracking-wider text-ink/60">{t.label}</div>
-        <div className="font-display text-xl font-medium text-ink">{t.conditions[condition]}</div>
-        <p className="text-base text-ink/75">{details.join(" · ")}</p>
-        {(snowy || cold) && (
-          <p className="mt-1 font-semibold text-ink">{snowy ? t.tipSnow : t.tipCold}</p>
-        )}
-        <a
-          href="https://open-meteo.com/"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-1 inline-block text-xs text-ink/50 underline-offset-2 hover:underline"
-        >
-          {t.source}
-        </a>
-      </div>
-    </div>
+    <WeatherTile t={t} icon={icon} label={t.label}>
+      <div className="font-display text-xl font-medium text-ink">{t.conditions[condition]}</div>
+      <p className="text-base text-ink/75">{details.join(" · ")}</p>
+      {(snowy || cold) && (
+        <p className="mt-1 font-semibold text-ink">{snowy ? t.tipSnow : t.tipCold}</p>
+      )}
+    </WeatherTile>
+  );
+}
+
+// The odds of snow on the day, from 30 years of history at the venue.
+function SnowPrediction({
+  t,
+  lang,
+  forecastSoon,
+}: {
+  t: Messages["forecast"];
+  lang: Lang;
+  forecastSoon: boolean;
+}) {
+  const h = SNOW_HISTORY;
+  const day = formatEventMonthDay(partyDate, lang);
+
+  return (
+    <WeatherTile t={t} icon="❄️" label={t.predictionLabel}>
+      <div className="font-display text-xl font-medium text-ink">{t.odds(h.chancePercent)}</div>
+      <p className="text-base text-ink/75">{t.typical(t.temp(h.typicalHigh), t.temp(h.typicalLow))}</p>
+      {h.biggest && (
+        <p className="text-base text-ink/75">{t.biggest(h.biggest.inches, h.biggest.year, day, h.years)}</p>
+      )}
+      <p className="mt-1 text-sm text-ink/60">
+        {t.basedOn(h.years, day)}
+        {forecastSoon && <> {t.forecastSoon}</>}
+      </p>
+    </WeatherTile>
   );
 }
