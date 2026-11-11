@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useMemo } from "react";
 import type { RsvpRow } from "@/lib/rsvp";
-import { EVENT_TIME_ZONE, MAX_FAMILY_MEMBERS, telHref } from "@/lib/event";
+import type { VisitRow } from "@/lib/visits";
+import { EVENT_TIME_ZONE, eventDay, MAX_FAMILY_MEMBERS, telHref } from "@/lib/event";
 import { downloadCsv } from "@/lib/csv";
 import { countPicks, describeAnswer, PREDICTION_QUESTIONS, type PredictionAnswers } from "@/lib/predictions";
 
@@ -46,6 +47,24 @@ function headcount(rsvps: RsvpRow[]): number {
 
 function hasPredictions(predictions: PredictionAnswers | null): predictions is PredictionAnswers {
   return predictions !== null && countPicks(predictions) > 0;
+}
+
+// Totals for the "Invitation visits" tiles. Days are Eastern-time dates.
+function summarizeVisits(rows: VisitRow[]) {
+  const today = eventDay(new Date());
+  const weekStart = eventDay(new Date(Date.now() - 6 * 24 * 60 * 60 * 1000));
+  const sum = (filter: (r: VisitRow) => boolean) =>
+    rows.filter(filter).reduce((total, r) => total + r.opens, 0);
+  return {
+    opens: sum(() => true),
+    devices: rows.reduce((total, r) => total + r.newdevices, 0),
+    today: sum((r) => r.day === today),
+    week: sum((r) => r.day >= weekStart),
+    english: sum((r) => r.lang === "en"),
+    french: sum((r) => r.lang === "fr"),
+    phone: sum((r) => r.device === "phone"),
+    computer: sum((r) => r.device === "computer"),
+  };
 }
 
 // Hover text for the 🔮 next to a guest's name, one question per line.
@@ -352,6 +371,8 @@ export default function AdminPage() {
   const [pendingDelete, setPendingDelete] = useState<RsvpRow | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState("");
+  // Null until loaded, or if they couldn't be - the section is then left out.
+  const [visits, setVisits] = useState<VisitRow[] | null>(null);
 
   useEffect(() => {
     checkAuth();
@@ -362,6 +383,7 @@ export default function AdminPage() {
   function handleSessionExpired() {
     setIsAuthenticated(false);
     setRsvps([]);
+    setVisits(null);
     setPendingEdit(null);
     setPendingDelete(null);
     setError(SESSION_EXPIRED);
@@ -374,6 +396,7 @@ export default function AdminPage() {
       setIsAuthenticated(data.authenticated);
       if (data.authenticated) {
         fetchRSVPs();
+        fetchVisits();
       }
     } catch {
       setIsAuthenticated(false);
@@ -403,6 +426,24 @@ export default function AdminPage() {
     }
   }
 
+  async function fetchVisits() {
+    try {
+      const res = await fetch("/api/visits");
+      if (res.status === 401) {
+        handleSessionExpired();
+        return;
+      }
+      setVisits(res.ok ? await res.json() : null);
+    } catch {
+      setVisits(null);
+    }
+  }
+
+  function refreshAll() {
+    fetchRSVPs();
+    fetchVisits();
+  }
+
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
     setError("");
@@ -417,7 +458,7 @@ export default function AdminPage() {
       if (res.ok) {
         setIsAuthenticated(true);
         setPassword("");
-        fetchRSVPs();
+        refreshAll();
       } else {
         const data = await res.json();
         setError(data.error || "Login failed");
@@ -432,6 +473,7 @@ export default function AdminPage() {
       await fetch("/api/admin/logout", { method: "POST" });
       setIsAuthenticated(false);
       setRsvps([]);
+      setVisits(null);
     } catch {
       console.error("Logout failed");
     }
@@ -491,6 +533,8 @@ export default function AdminPage() {
       ),
     [rsvps, filter, search]
   );
+
+  const visitSummary = useMemo(() => (visits ? summarizeVisits(visits) : null), [visits]);
 
   const predictionCount = useMemo(
     () => rsvps.filter((r) => hasPredictions(r.predictions)).length,
@@ -595,7 +639,7 @@ export default function AdminPage() {
               Prediction results
             </a>
             <button
-              onClick={fetchRSVPs}
+              onClick={refreshAll}
               disabled={dataLoading}
               className="btn-chunky bg-white py-2"
             >
@@ -613,6 +657,30 @@ export default function AdminPage() {
           <StatTile label="Declined" value={declinedCount} tint="bg-blush/35" />
           <StatTile label="Total replies" value={rsvps.length} tint="bg-white" />
         </div>
+
+        {visitSummary && (
+          <section aria-labelledby="visits-title" className="mb-10">
+            <h2 id="visits-title" className="mb-3 font-display text-xl font-bold text-ink">
+              Invitation visits
+            </h2>
+            <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+              <StatTile label="Times opened" value={visitSummary.opens} tint="bg-periwinkle/30" />
+              <StatTile label="Different devices" value={visitSummary.devices} tint="bg-lilac" />
+              <StatTile label="Opened today" value={visitSummary.today} tint="bg-white" />
+              <StatTile label="Last 7 days" value={visitSummary.week} tint="bg-white" />
+            </div>
+            <p className="mt-3 text-sm text-ink/70">
+              {visitSummary.opens > 0 && (
+                <>
+                  English {visitSummary.english} · French {visitSummary.french} · Phone{" "}
+                  {visitSummary.phone} · Computer {visitSummary.computer}.{" "}
+                </>
+              )}
+              Each visit counts once, with no personal details. &ldquo;Different devices&rdquo; is
+              roughly the number of people. Your own visits while logged in here aren&apos;t counted.
+            </p>
+          </section>
+        )}
 
         {loadError ? (
           <div className="sticker p-8 text-center">

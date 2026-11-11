@@ -1,5 +1,6 @@
-import { Balloon, Bunting, PartyOwl, Snowfall } from "./decor";
+import { Balloon, Bunting, Snowfall } from "./decor";
 import LanguageToggle from "./LanguageToggle";
+import TappableOwl from "./TappableOwl";
 import { formatEventDate, formatEventTime, partyDate, type PartyPhase } from "@/lib/event";
 import { getMessages, type Lang } from "@/lib/i18n";
 
@@ -80,7 +81,7 @@ export default function Hero({
               </span>
             ))}
           </div>
-          <PartyOwl className="w-24 shrink-0 origin-bottom animate-wobble md:w-44" />
+          <TappableOwl lang={lang} className="w-24 shrink-0 md:w-44" />
         </div>
 
         <h1 className="mt-6 font-display text-3xl font-bold text-ink md:text-5xl">{t.title}</h1>

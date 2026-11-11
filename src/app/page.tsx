@@ -17,6 +17,7 @@ import ContactSection from "./components/ContactSection";
 import Footer from "./components/Footer";
 import AnimatedSection from "./components/AnimatedSection";
 import Promo from "./components/Promo";
+import VisitCounter from "./components/VisitCounter";
 import { SectionHeading, SnowDrift, Snowfall } from "./components/decor";
 import { HOST, isPartyPhase, isRsvpOpen, partyDate, partyPhase, VENUE } from "@/lib/event";
 import { getMessages } from "@/lib/i18n";
@@ -148,6 +149,10 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
       </AnimatedSection>
 
       <Footer lang={lang} phase={phase} />
+
+      {/* Counts the visit for the admin page; previews are the hosts
+          checking the site, so they're left out. */}
+      {!preview && <VisitCounter lang={lang} />}
     </div>
   );
 }

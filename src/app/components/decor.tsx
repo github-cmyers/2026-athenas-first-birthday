@@ -211,19 +211,41 @@ export const OWL_COLORS = {
 // Both come off where the owl stands for her name rather than the birthday.
 // Width and height are passed straight to the <svg> for the preview image,
 // which needs explicit pixel sizes; on the page, size it with className.
+//
+// `animated` gives the wings and eyes their own groups with class names, so
+// the tappable owl in the header can flap and blink (see .owl-tapped in
+// globals.css). Without it the drawing is exactly as before, which keeps the
+// preview image's renderer on markup it is known to handle.
 export function PartyOwl({
   hat = true,
+  animated = false,
   className = "",
   width,
   height,
 }: {
   hat?: boolean;
+  animated?: boolean;
   className?: string;
   width?: number;
   height?: number;
 }) {
   const c = OWL_COLORS;
   const outline = { stroke: c.ink, strokeLinejoin: "round" as const };
+
+  const leftWing = (
+    <ellipse cx="36" cy="166" rx="15" ry="34" transform="rotate(14 36 166)" fill={c.wing} strokeWidth="5" {...outline} />
+  );
+  const rightWing = (
+    <ellipse cx="164" cy="166" rx="15" ry="34" transform="rotate(-14 164 166)" fill={c.wing} strokeWidth="5" {...outline} />
+  );
+  const eyes = [
+    <circle key="lw" cx="70" cy="122" r="29" fill={c.white} stroke={c.ink} strokeWidth="5" />,
+    <circle key="rw" cx="130" cy="122" r="29" fill={c.white} stroke={c.ink} strokeWidth="5" />,
+    <circle key="lp" cx="74" cy="126" r="13" fill={c.ink} />,
+    <circle key="rp" cx="126" cy="126" r="13" fill={c.ink} />,
+    <circle key="lh" cx="79" cy="120" r="4.5" fill={c.white} />,
+    <circle key="rh" cx="131" cy="120" r="4.5" fill={c.white} />,
+  ];
 
   return (
     <svg viewBox="-6 -14 212 252" aria-hidden="true" className={className} width={width} height={height}>
@@ -244,20 +266,15 @@ export function PartyOwl({
       />
 
       {/* Wings */}
-      <ellipse cx="36" cy="166" rx="15" ry="34" transform="rotate(14 36 166)" fill={c.wing} strokeWidth="5" {...outline} />
-      <ellipse cx="164" cy="166" rx="15" ry="34" transform="rotate(-14 164 166)" fill={c.wing} strokeWidth="5" {...outline} />
+      {animated ? <g className="owl-wing-left">{leftWing}</g> : leftWing}
+      {animated ? <g className="owl-wing-right">{rightWing}</g> : rightWing}
 
       {/* Cheeks */}
       <circle cx="62" cy="160" r="7" fill={c.cheek} />
       <circle cx="138" cy="160" r="7" fill={c.cheek} />
 
       {/* Eyes */}
-      <circle cx="70" cy="122" r="29" fill={c.white} stroke={c.ink} strokeWidth="5" />
-      <circle cx="130" cy="122" r="29" fill={c.white} stroke={c.ink} strokeWidth="5" />
-      <circle cx="74" cy="126" r="13" fill={c.ink} />
-      <circle cx="126" cy="126" r="13" fill={c.ink} />
-      <circle cx="79" cy="120" r="4.5" fill={c.white} />
-      <circle cx="131" cy="120" r="4.5" fill={c.white} />
+      {animated ? <g className="owl-eyes">{eyes}</g> : eyes}
 
       {/* Beak, nestled between the eyes and drawn over their lower inner
           edges so it reads as part of the face rather than floating below. */}

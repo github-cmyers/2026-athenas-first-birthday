@@ -37,6 +37,15 @@ const en = {
     details: "Party details",
     schedule: "Today's schedule",
     photos: "See the photos",
+    // Tapping the owl: a speech bubble, a different line each tap.
+    owlLabel: "Say hi to the owl",
+    hoots: [
+      "Hoo-hoo! 🦉",
+      "Whooo's turning ONE? Athena! 🎉",
+      "Happy birthday, Athena! 🎂",
+      "Bundle up, it's snowy! ❄️",
+      "Hoo-ray! 🎈",
+    ],
   },
   about: {
     eyebrow: "Hooray!",
@@ -232,6 +241,7 @@ export function frenchSpacing(text: string): string {
 
 function typesetFrench<T>(value: T): T {
   if (typeof value === "string") return frenchSpacing(value) as T;
+  if (Array.isArray(value)) return value.map(typesetFrench) as T;
   if (typeof value === "function") {
     const fn = value as (...args: never[]) => string;
     return ((...args: never[]) => frenchSpacing(fn(...args))) as T;
@@ -266,6 +276,14 @@ const fr: Messages = typesetFrench({
     details: "Infos pratiques",
     schedule: "Programme du jour",
     photos: "Voir les photos",
+    owlLabel: "Dites bonjour à la chouette",
+    hoots: [
+      "Hou hou ! 🦉",
+      "Qui fête ses un an ? Athena ! 🎉",
+      "Joyeux anniversaire, Athena ! 🎂",
+      "Couvrez-vous, il neige ! ❄️",
+      "Hourra ! 🎈",
+    ],
   },
   about: {
     eyebrow: "Hourra !",

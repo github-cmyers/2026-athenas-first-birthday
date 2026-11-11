@@ -21,6 +21,7 @@ These still need real details or a final check:
 ### For guests
 
 - **Invitation.** A winter-themed page: falling snow, bunting, balloons, and Athena's owl in a party hat and scarf under "Look whooo's turning ONE!". It respects the device's "reduce motion" setting.
+- **Tap the owl.** Tapping the owl in the header makes it hop, flap, blink and puff out snowflakes, with a soft "hoo-hoo" and a speech bubble. The bubble's line changes with each tap. With "reduce motion" on, only the bubble appears. The lines are `hero.hoots` in [src/lib/i18n.ts](src/lib/i18n.ts).
 - **RSVP.** Guests accept or decline and give the number of attending family members, themselves included (1 to 8). A live badge shows how many guests and families are coming.
 - **Predictions for Athena.** Right after replying, guests are asked four fun questions about Athena's future, picking as many answers as they like. Everyone's predictions are revealed on party day (see [Predictions for Athena](#predictions-for-athena)).
 - **Countdown** to the start of the party.
@@ -33,7 +34,7 @@ These still need real details or a final check:
 
 ### For hosts
 
-- **Admin page** at `/admin` to see, search, filter, edit, remove and export RSVPs (see [Admin page](#admin-page)).
+- **Admin page** at `/admin` to see, search, filter, edit, remove and export RSVPs, and to see how often the invitation has been opened (see [Admin page](#admin-page)).
 - **Printable invitation** at `/invite`: a 5×7 card with a QR code that opens the site (see [Printable invitation](#printable-invitation)).
 - **Private guest list.** Names, phone numbers and emails are only ever sent to a logged-in admin. The public page only sees totals.
 
@@ -122,6 +123,7 @@ Previews need the site's full address. Set `SITE_URL` in production. Without it,
 Go to `/admin` and log in with `ADMIN_PASSWORD`. A login lasts 12 hours. Changing the password logs everyone out.
 
 - **Totals:** guests coming (everyone counted), families coming, declined, and total replies.
+- **Invitation visits:** how many times the invitation has been opened (in total, today and in the last 7 days), from how many different devices, and the split by English/French and phone/computer. See [Visit counts](#visit-counts).
 - **Search** by name, email or phone. Phone search ignores punctuation, so `0199` finds `(802) 555-0199`.
 - **Filter** to all, attending or declined.
 - **Edit** any RSVP, including switching a decline to attending. Edits follow the same rules as the public form, and work even after RSVPs have closed.
@@ -132,6 +134,14 @@ Go to `/admin` and log in with `ADMIN_PASSWORD`. A login lasts 12 hours. Changin
 - **Prediction results** opens the party-day results early.
 
 If the login expires while the page is open, the next refresh, edit or removal returns you to the login screen with a message.
+
+### Visit counts
+
+The home page tells the server once per visit that it was opened. Refreshing or switching language in the same visit doesn't count again. The server keeps only daily totals, per language and per phone/computer. It stores no IP addresses, names or identifiers.
+
+- **"Different devices"** counts each browser's first-ever visit, using a flag kept in that browser. It's roughly the number of people. Someone who opens the link on both their phone and computer counts twice, and so does someone browsing privately.
+- **Not counted:** your own visits while logged in to the admin page, `?preview=` links, link-preview fetchers (iMessage, WhatsApp, Facebook), search crawlers and automated browsers.
+- Days follow Eastern time.
 
 ## Configuration
 
@@ -205,6 +215,8 @@ RSVPs are stored in the `RSVP_First_Birthday` table, created automatically:
 
 `Predictions` and `PredictionToken` are added automatically to a table created before predictions existed. Existing RSVPs are kept.
 
+Visit counts are kept in the `Visits_First_Birthday` table, also created automatically. It has one row per day, language (`en`/`fr`) and device (`phone`/`computer`), with that day's `Opens` and `NewDevices`.
+
 The naming ceremony's `RSVP_Naming_Ceremony` table is left untouched, even if both sites share a database.
 
 ## API
@@ -215,6 +227,8 @@ The naming ceremony's `RSVP_Naming_Ceremony` table is left untouched, even if bo
 | `POST /api/predictions` | Holder of a `predictionToken` | Save (or replace) the predictions for that RSVP. Unknown answers are ignored. Returns `400` if nothing valid was picked, and `404` for an unknown token. |
 | `GET /api/rsvp/count` | Public | Totals only: families, guests, declined. |
 | `GET /api/rsvp` | Admin | The full guest list. |
+| `POST /api/visits` | Public | Count one opening of the invitation (sent by the home page). Skips bots and logged-in admins. |
+| `GET /api/visits` | Admin | The daily visit counts. |
 | `PATCH /api/rsvp/[id]` | Admin | Edit an RSVP. |
 | `DELETE /api/rsvp/[id]` | Admin | Remove an RSVP. |
 | `POST /api/admin/login`, `POST /api/admin/logout`, `GET /api/admin/check` | — | Admin session. |
@@ -237,6 +251,7 @@ src/
     lang.ts                works out each visitor's language
     rsvp.ts                RSVP table and validation
     predictions.ts         prediction questions, validation and vote counts
+    visits.ts              invitation visit counts
     forecast.ts            live forecast and the stored snow prediction
     csv.ts                 CSV export
     site.ts                the site's public address
