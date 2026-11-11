@@ -297,26 +297,32 @@ function EditDialog({
           </div>
         )}
 
+        {/* Guests who decline only give their name, so contact details are
+            required for attending guests only. */}
         <div>
-          <label htmlFor="edit-phone" className={LABEL}>Phone</label>
+          <label htmlFor="edit-phone" className={LABEL}>
+            Phone{!attending && <span className="font-normal text-ink/60"> (optional)</span>}
+          </label>
           <input
             id="edit-phone"
             type="tel"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
-            required
+            required={attending}
             className={FIELD}
           />
         </div>
 
         <div>
-          <label htmlFor="edit-email" className={LABEL}>Email</label>
+          <label htmlFor="edit-email" className={LABEL}>
+            Email{!attending && <span className="font-normal text-ink/60"> (optional)</span>}
+          </label>
           <input
             id="edit-email"
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            required
+            required={attending}
             className={FIELD}
           />
         </div>
@@ -807,15 +813,24 @@ export default function AdminPage() {
                           <td className="px-5 py-4 text-sm tabular-nums text-ink">
                             {rsvp.attending ? rsvp.familymembers : "—"}
                           </td>
+                          {/* Declines may have no phone or email */}
                           <td className="whitespace-nowrap px-5 py-4 text-sm text-ink">
-                            <a href={telHref(rsvp.phone)} className="hover:underline">
-                              {rsvp.phone}
-                            </a>
+                            {rsvp.phone ? (
+                              <a href={telHref(rsvp.phone)} className="hover:underline">
+                                {rsvp.phone}
+                              </a>
+                            ) : (
+                              <span className="text-ink/40">—</span>
+                            )}
                           </td>
                           <td className="px-5 py-4 text-sm text-ink">
-                            <a href={`mailto:${rsvp.email}`} className="hover:underline">
-                              {rsvp.email}
-                            </a>
+                            {rsvp.email ? (
+                              <a href={`mailto:${rsvp.email}`} className="hover:underline">
+                                {rsvp.email}
+                              </a>
+                            ) : (
+                              <span className="text-ink/40">—</span>
+                            )}
                           </td>
                           <td className="whitespace-nowrap px-5 py-4 text-sm text-ink/80">
                             {formatSubmitted(rsvp.createdat)}

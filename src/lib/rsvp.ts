@@ -109,7 +109,18 @@ export function parseRsvpInput(body: unknown): ParseResult {
   const phone = text(data.phone);
   const email = text(data.email);
 
-  if (!name || !phone || !email) {
+  if (typeof data.attending !== "boolean") {
+    return { ok: false, error: "An attending response is required" };
+  }
+  const attending = data.attending;
+
+  // Someone declining only needs to give their name; the form doesn't ask
+  // for their phone or email. Guests who are coming give all three, so the
+  // hosts can reach them. Declines store empty strings.
+  if (!name) {
+    return { ok: false, error: "Please enter your name" };
+  }
+  if (attending && (!phone || !email)) {
     return { ok: false, error: "Name, phone, and email are required" };
   }
   const fields = { name, phone, email };
@@ -118,14 +129,10 @@ export function parseRsvpInput(body: unknown): ParseResult {
       return { ok: false, error: `The ${field} is too long` };
     }
   }
-  if (!/^\S+@\S+\.\S+$/.test(email)) {
+  // Checked whenever there is one - a host may add an email to a decline.
+  if (email && !/^\S+@\S+\.\S+$/.test(email)) {
     return { ok: false, error: "Please enter a valid email address" };
   }
-
-  if (typeof data.attending !== "boolean") {
-    return { ok: false, error: "An attending response is required" };
-  }
-  const attending = data.attending;
 
   // Someone who is not coming brings no one, whatever was sent. Anyone who
   // is coming counts at least themselves, and is capped at the same limit

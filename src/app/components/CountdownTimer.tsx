@@ -27,15 +27,18 @@ const BLOCKS = [
 function Blocks({ lang, values }: { lang: Lang; values: (number | null)[] }) {
   const t = getMessages(lang).countdown;
   return (
-    <div className="mx-auto grid max-w-xl grid-cols-4 gap-3 pt-2 md:gap-6">
+    <div className="mx-auto grid max-w-xl grid-cols-4 gap-3 pt-5 md:gap-6 md:pt-6">
       {BLOCKS.map((block, i) => (
         <div
           key={block.unit}
           className={`relative flex aspect-square flex-col items-center justify-center rounded-2xl border-[3px] border-ink text-ink shadow-[5px_5px_0_0_var(--color-snow)] ${block.style}`}
         >
-          {/* Offsets put the cap's outline on the block's top border line:
-              the outline sits 14/22 of the way down the cap. */}
-          <SnowCap className="absolute -top-3.5 left-3 right-3 h-5 md:top-[-17px] md:h-6" />
+          {/* The snow sits on top of the block, its flat base resting on the
+              block's top border, like the snow on the cards. Overlapping the
+              block instead covered its border and left white notches at the
+              cap's ends on small screens. `bottom` is measured from inside
+              the border, hence the extra 3px. */}
+          <SnowCap className="absolute bottom-[calc(100%+3px)] left-2.5 right-2.5 h-4 md:left-3 md:right-3 md:h-5" />
           <div className="font-display text-3xl font-bold tabular-nums md:text-6xl">
             {values[i] === null ? "--" : String(values[i]).padStart(2, "0")}
           </div>

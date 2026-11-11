@@ -337,6 +337,10 @@ export default function RSVPForm({ lang }: { lang: Lang }) {
         body: JSON.stringify({
           ...formData,
           familyMembers: attending ? Number(formData.familyMembers) : 0,
+          // Not asked of guests who decline - drop anything typed before
+          // they switched to declining.
+          phone: attending ? formData.phone : "",
+          email: attending ? formData.email : "",
           attending,
         }),
       });
@@ -446,27 +450,33 @@ export default function RSVPForm({ lang }: { lang: Lang }) {
         </div>
       )}
 
-      <FloatingInput
-        id="phone"
-        name="phone"
-        type="tel"
-        label={t.phone}
-        value={formData.phone}
-        onChange={handleChange}
-        disabled={loading}
-        required
-      />
+      {/* Contact details only matter for guests who are coming; someone
+          declining just gives their name. */}
+      {attending && (
+        <>
+          <FloatingInput
+            id="phone"
+            name="phone"
+            type="tel"
+            label={t.phone}
+            value={formData.phone}
+            onChange={handleChange}
+            disabled={loading}
+            required
+          />
 
-      <FloatingInput
-        id="email"
-        name="email"
-        type="email"
-        label={t.email}
-        value={formData.email}
-        onChange={handleChange}
-        disabled={loading}
-        required
-      />
+          <FloatingInput
+            id="email"
+            name="email"
+            type="email"
+            label={t.email}
+            value={formData.email}
+            onChange={handleChange}
+            disabled={loading}
+            required
+          />
+        </>
+      )}
 
       <button
         type="submit"

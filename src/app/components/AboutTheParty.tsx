@@ -13,7 +13,6 @@ export default function AboutTheParty({ lang }: { lang: Lang }) {
       <div className="sticker space-y-4 p-6 text-lg leading-relaxed text-ink/85 md:p-10">
         <p>{t.p1}</p>
         <p>{t.p2}</p>
-        <p className="font-semibold text-ink">{t.gift}</p>
       </div>
     </section>
   );

@@ -52,7 +52,6 @@ const en = {
     title: "Athena is turning one!",
     p1: "It's hard to believe a whole year has passed since we welcomed Athena into the world. Many of you celebrated with us at her naming ceremony, and we would love for you to join us again as we mark her very first birthday.",
     p2: "Come share cake, laughter, and plenty of smiles as we celebrate our little girl and all of the family and friends who have loved and supported her through her first year.",
-    gift: "🎁 Please do not feel obligated to bring a gift — your presence and love are the most cherished gifts as we celebrate Athena's first year.",
   },
   thankYou: {
     eyebrow: "Thank you",
@@ -289,9 +288,7 @@ const fr: Messages = typesetFrench({
     eyebrow: "Hourra !",
     title: "Athena va avoir un an !",
     p1: "Difficile de croire qu'une année entière s'est écoulée depuis que nous avons accueilli Athena. Beaucoup d'entre vous étaient à nos côtés pour son baptême, et nous serions ravis de vous retrouver pour fêter son tout premier anniversaire.",
-    p2: "Venez partager le gâteau, les rires et plein de sourires pour célébrer notre petite fille, ainsi que toute la famille et les amis qui l'ont entourée d'amour tout au long de sa première année.",
-    gift: "🎁 Ne vous sentez surtout pas obligés d'apporter un cadeau : votre présence et votre affection sont les plus beaux cadeaux pour célébrer la première année d'Athena.",
-  },
+    p2: "Venez partager le gâteau, les rires et plein de sourires pour célébrer notre petite fille, ainsi que toute la famille et les amis qui l'ont entourée d'amour tout au long de sa première année.",  },
   thankYou: {
     eyebrow: "Merci",
     title: "Quelle belle fête !",

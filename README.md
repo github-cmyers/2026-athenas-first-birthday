@@ -22,7 +22,7 @@ These still need real details or a final check:
 
 - **Invitation.** A winter-themed page: falling snow, bunting, balloons, and Athena's owl in a party hat and scarf under "Look whooo's turning ONE!". It respects the device's "reduce motion" setting.
 - **Tap the owl.** Tapping the owl in the header makes it hop, flap, blink and puff out snowflakes, with a soft "hoo-hoo" and a speech bubble. The bubble's line changes with each tap. With "reduce motion" on, only the bubble appears. The lines are `hero.hoots` in [src/lib/i18n.ts](src/lib/i18n.ts).
-- **RSVP.** Guests accept or decline and give the number of attending family members, themselves included (1 to 8). A live badge shows how many guests and families are coming.
+- **RSVP.** Guests who are coming give their name, phone, email and the number of attending family members, themselves included (1 to 8). Guests who decline only give their name. A live badge shows how many guests and families are coming.
 - **Predictions for Athena.** Right after replying, guests are asked four fun questions about Athena's future, picking as many answers as they like. Everyone's predictions are revealed on party day (see [Predictions for Athena](#predictions-for-athena)).
 - **Countdown** to the start of the party.
 - **Where & when.** Date, time and venue, a map, and "Add to Calendar" for Google Calendar, Outlook or an `.ics` file (Apple and others).
@@ -206,7 +206,7 @@ RSVPs are stored in the `RSVP_First_Birthday` table, created automatically:
 
 | Column | Meaning |
 | --- | --- |
-| `Name`, `Phone`, `Email` | As entered by the guest. |
+| `Name`, `Phone`, `Email` | As entered by the guest. Phone and email are empty for declines, which only ask for a name. |
 | `Attending` | `true` for accepts, `false` for declines. |
 | `FamilyMembers` | Everyone the RSVP covers, the guest included (1 for someone coming alone). `0` for declines. |
 | `CreatedAt` | When the RSVP was submitted. |
