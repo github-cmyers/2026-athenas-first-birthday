@@ -1,5 +1,5 @@
 import { getPartyWeather, SNOW_HISTORY, type PartyForecast as Forecast } from "@/lib/forecast";
-import { formatEventMonthDay, formatEventTime, partyDate } from "@/lib/event";
+import { formatEventTime, partyDate } from "@/lib/event";
 import { getMessages, type Lang, type Messages } from "@/lib/i18n";
 
 type Condition = keyof Messages["forecast"]["conditions"];
@@ -32,7 +32,7 @@ export default async function PartyForecast({ lang }: { lang: Lang }) {
   return weather.kind === "forecast" ? (
     <LiveForecast t={t} lang={lang} forecast={weather.forecast} />
   ) : (
-    <SnowPrediction t={t} lang={lang} forecastSoon={weather.forecastSoon} />
+    <SnowPrediction t={t} forecastSoon={weather.forecastSoon} />
   );
 }
 
@@ -97,29 +97,14 @@ function LiveForecast({ t, lang, forecast }: { t: Messages["forecast"]; lang: La
 }
 
 // The odds of snow on the day, from 30 years of history at the venue.
-function SnowPrediction({
-  t,
-  lang,
-  forecastSoon,
-}: {
-  t: Messages["forecast"];
-  lang: Lang;
-  forecastSoon: boolean;
-}) {
+function SnowPrediction({ t, forecastSoon }: { t: Messages["forecast"]; forecastSoon: boolean }) {
   const h = SNOW_HISTORY;
-  const day = formatEventMonthDay(partyDate, lang);
 
   return (
     <WeatherTile t={t} icon="❄️" label={t.predictionLabel}>
       <div className="font-display text-xl font-medium text-ink">{t.odds(h.chancePercent)}</div>
       <p className="text-base text-ink/75">{t.typical(t.temp(h.typicalHigh), t.temp(h.typicalLow))}</p>
-      {h.biggest && (
-        <p className="text-base text-ink/75">{t.biggest(h.biggest.inches, h.biggest.year, day, h.years)}</p>
-      )}
-      <p className="mt-1 text-sm text-ink/60">
-        {t.basedOn(h.years, day)}
-        {forecastSoon && <> {t.forecastSoon}</>}
-      </p>
+      {forecastSoon && <p className="mt-1 text-sm text-ink/60">{t.forecastSoon}</p>}
     </WeatherTile>
   );
 }

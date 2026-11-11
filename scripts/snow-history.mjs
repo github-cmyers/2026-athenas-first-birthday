@@ -41,9 +41,7 @@ async function fetchYear(year) {
       const res = await fetch(url, { signal: AbortSignal.timeout(60_000) });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const { daily } = await res.json();
-      return daily.time.map((date, i) => ({
-        year,
-        onTheDay: date.endsWith(`-${monthDay}`),
+      return daily.time.map((_, i) => ({
         snow: daily.snowfall_sum[i] ?? 0,
         high: daily.temperature_2m_max[i],
         low: daily.temperature_2m_min[i],
@@ -68,7 +66,6 @@ const median = (values) => {
   const mid = sorted.length >> 1;
   return sorted.length % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
 };
-const biggest = days.filter((d) => d.onTheDay).reduce((a, b) => (b.snow > a.snow ? b : a));
 
 console.log(
   JSON.stringify(
@@ -78,7 +75,6 @@ console.log(
       chancePercent: Math.round((days.filter((d) => d.snow >= SNOW_INCHES).length / days.length) * 100),
       typicalHigh: Math.round(median(days.map((d) => d.high))),
       typicalLow: Math.round(median(days.map((d) => d.low))),
-      biggest: biggest.snow >= SNOW_INCHES ? { year: biggest.year, inches: Math.round(biggest.snow * 10) / 10 } : null,
     },
     null,
     2

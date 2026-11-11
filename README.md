@@ -96,7 +96,7 @@ When an RSVP goes through, a pop-up asks four questions, such as "When she grows
 
 The weather tile in "Where & when" is always shown until the party is over. Its data comes from [Open-Meteo](https://open-meteo.com/), which is free and needs no account. The site credits it under the tile, as its licence requires.
 
-- **More than 2 weeks out: "Snow Prediction".** The odds of snow, the typical high and low, and the biggest snowfall on the date, all from 30 years of weather history at the venue's town. For December 19 in North Providence, that's about a 1 in 7 chance of snow, a typical high of 40°F and low of 27°F, and 6" in 2008.
+- **More than 2 weeks out: "Snow Prediction".** The odds of snow and the typical high and low, from 30 years of weather history around the date in the venue's town. For December 19 in North Providence, that's about a 1 in 7 chance of snow, with a typical high of 40°F and low of 27°F.
 - **The last 2 weeks: "Party-day forecast".** The live forecast. Results are reused for an hour, so guests' visits don't each call the service. If the service is slow (over 4 seconds) or down, the tile shows the snow prediction instead. The rest of the page never waits for it.
 
 The snow prediction's numbers are stored in `SNOW_HISTORY` in [src/lib/forecast.ts](src/lib/forecast.ts), because Open-Meteo's history service takes a minute or more to answer. If the party date or the venue's town changes, recompute them and paste the output over the old values:

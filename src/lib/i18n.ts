@@ -94,9 +94,6 @@ const en = {
           ? `${percent}% chance of snow`
           : `About a 1 in ${Math.round(100 / percent)} chance of snow`,
     typical: (high: string, low: string) => `Typical high ${high} · Low ${low}`,
-    biggest: (inches: number, year: number, day: string, years: number) =>
-      `Biggest ${day} snowfall in ${years} years: ${Math.round(inches)}" in ${year}`,
-    basedOn: (years: number, day: string) => `Based on ${years} years of weather around ${day}.`,
     forecastSoon: "The real forecast appears 2 weeks before the party.",
     temp: (fahrenheit: number) => `${Math.round(fahrenheit)}°F`,
     atStart: (temp: string, time: string) => `${temp} at ${time}`,
@@ -325,9 +322,6 @@ const fr: Messages = typesetFrench({
           ? `${percent} % de chances de neige`
           : `Environ 1 chance sur ${Math.round(100 / percent)} qu'il neige`,
     typical: (high: string, low: string) => `Max habituel ${high} · Min habituel ${low}`,
-    biggest: (inches: number, year: number, day: string, years: number) =>
-      `Plus forte chute de neige un ${day} en ${years} ans : ${Math.round(inches * 2.54)} cm en ${year}`,
-    basedOn: (years: number, day: string) => `D'après ${years} ans de météo autour du ${day}.`,
     forecastSoon: "La vraie prévision apparaîtra 2 semaines avant la fête.",
     // French readers get Celsius and centimetres.
     temp: (fahrenheit: number) => `${Math.round(((fahrenheit - 32) * 5) / 9)} °C`,

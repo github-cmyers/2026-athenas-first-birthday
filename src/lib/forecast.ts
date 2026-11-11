@@ -18,8 +18,8 @@ const FORECAST_RANGE_DAYS = 14;
 // and the past doesn't change.
 //
 // chancePercent: share of days within 3 days of Dec 19 with at least 0.1" of
-// snow. typicalHigh/Low: median °F over the same days. biggest: the largest
-// snowfall on Dec 19 itself.
+// snow. typicalHigh/Low: median °F over the same days. years/lastYear: the
+// span of history used.
 //
 // Recompute with scripts/snow-history.mjs if the date or the venue's town
 // changes.
@@ -29,7 +29,6 @@ export const SNOW_HISTORY = {
   chancePercent: 14,
   typicalHigh: 40,
   typicalLow: 27,
-  biggest: { year: 2008, inches: 6.3 } as { year: number; inches: number } | null,
 };
 
 export interface PartyForecast {
