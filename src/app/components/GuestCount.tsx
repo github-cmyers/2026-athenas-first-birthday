@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { getMessages, type Lang } from "@/lib/i18n";
 
 interface RSVPCount {
   families: number;
@@ -10,7 +11,8 @@ interface RSVPCount {
 const BADGE =
   "inline-block -rotate-2 rounded-2xl border-[3px] border-ink bg-white px-6 py-3 text-ink shadow-[4px_4px_0_0_var(--color-ink)]";
 
-export default function GuestCount() {
+export default function GuestCount({ lang }: { lang: Lang }) {
+  const t = getMessages(lang).guestCount;
   const [counts, setCounts] = useState<RSVPCount | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -46,7 +48,7 @@ export default function GuestCount() {
     return (
       <div className="mb-12 text-center">
         <div className={`${BADGE} animate-pulse`}>
-          <span className="invisible font-display text-lg">Loading...</span>
+          <span className="invisible font-display text-lg">{t.loading}</span>
         </div>
       </div>
     );
@@ -57,7 +59,7 @@ export default function GuestCount() {
       <div className="mb-12 text-center">
         <div className={BADGE}>
           <span className="font-display text-lg font-semibold">
-            ❄️ Be the first to RSVP!
+            {t.first}
           </span>
         </div>
       </div>
@@ -72,13 +74,13 @@ export default function GuestCount() {
           <div className="font-display">
             <span className="text-3xl font-bold">{counts.guests}</span>
             <span className="ml-2 text-lg font-medium">
-              {counts.guests === 1 ? "guest" : "guests"} coming
+              {t.coming(counts.guests)}
             </span>
           </div>
           <span className="text-3xl" aria-hidden="true">🎉</span>
         </div>
         <p className="mt-0.5 text-sm text-ink/70">
-          {counts.families} {counts.families === 1 ? "family" : "families"} have RSVP&apos;d
+          {t.families(counts.families)}
         </p>
       </div>
     </div>

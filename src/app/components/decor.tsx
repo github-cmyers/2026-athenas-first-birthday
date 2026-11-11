@@ -31,6 +31,16 @@ export const BG: Record<PartyColor | "white", string> = {
   white: "bg-white",
 };
 
+// Each "Predictions for Athena" question has its own colour, the same in the
+// questions modal and in the results: the number badge, a picked answer's
+// fill, and the results bars.
+export const PREDICTION_ACCENTS = [
+  { badge: "bg-blush", picked: "bg-blush/45", bar: "bg-blush" },
+  { badge: "bg-glacier", picked: "bg-glacier/55", bar: "bg-glacier" },
+  { badge: "bg-periwinkle", picked: "bg-periwinkle/50", bar: "bg-periwinkle" },
+  { badge: "bg-sky", picked: "bg-sky/35", bar: "bg-sky" },
+];
+
 const TEXT: Record<PartyColor, string> = {
   blush: "text-blush",
   sky: "text-sky",

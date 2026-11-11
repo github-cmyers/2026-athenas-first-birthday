@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import { headers } from "next/headers";
 import { Fredoka, Nunito } from "next/font/google";
+import { siteUrl } from "@/lib/site";
 import "./globals.css";
 
 const fredoka = Fredoka({
@@ -18,20 +18,7 @@ const DESCRIPTION =
   "Look whooo's turning ONE! You're invited to Athena's Winter ONEderland first birthday party.";
 
 // Link previews need the image's full URL, so Next must know the site's
-// public address. SITE_URL (e.g. https://athena.example.com) is the reliable
-// way to set it in production. Without it, the address the request came in
-// on is used, which is right behind most hosts and reverse proxies.
-async function siteUrl(): Promise<URL> {
-  if (process.env.SITE_URL) return new URL(process.env.SITE_URL);
-
-  const h = await headers();
-  const host = h.get("x-forwarded-host") ?? h.get("host") ?? "localhost:3000";
-  const proto =
-    h.get("x-forwarded-proto") ??
-    (host.startsWith("localhost") || host.startsWith("127.") ? "http" : "https");
-  return new URL(`${proto}://${host}`);
-}
-
+// public address; see siteUrl().
 export async function generateMetadata(): Promise<Metadata> {
   return {
     metadataBase: await siteUrl(),

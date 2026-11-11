@@ -1,12 +1,15 @@
 import { telHref } from "@/lib/event";
+import { getMessages, type Lang } from "@/lib/i18n";
 
 interface ContactSectionProps {
+  lang: Lang;
   name: string;
   phone: string;
   email?: string;
 }
 
-export default function ContactSection({ name, phone, email }: ContactSectionProps) {
+export default function ContactSection({ lang, name, phone, email }: ContactSectionProps) {
+  const t = getMessages(lang).contact;
   const phoneLink = telHref(phone);
   const emailLink = email ? `mailto:${email}` : null;
 
@@ -14,10 +17,10 @@ export default function ContactSection({ name, phone, email }: ContactSectionPro
     <section className="mx-auto mb-16 max-w-3xl px-4 pt-6">
       <div className="sticker relative p-6 pt-10 text-center md:p-10">
         <span className="chip absolute -top-4 left-1/2 -translate-x-1/2 -rotate-2 bg-glacier">
-          Questions?
+          {t.chip}
         </span>
         <p className="mb-5 text-lg text-ink/80">
-          Feel free to reach out to {name} if you have any questions:
+          {t.text(name)}
         </p>
         <div className="space-y-3">
           <a href={phoneLink} className="btn-chunky bg-glacier text-lg">

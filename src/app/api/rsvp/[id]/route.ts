@@ -4,6 +4,7 @@ import {
   ensureRsvpTable,
   parseRsvpId,
   parseRsvpInput,
+  RSVP_COLUMNS,
   RSVP_TABLE,
   type RsvpRow,
 } from "@/lib/rsvp";
@@ -37,7 +38,7 @@ export async function PATCH(request: NextRequest, { params }: Params) {
       `UPDATE ${RSVP_TABLE}
          SET Name = $1, FamilyMembers = $2, Phone = $3, Email = $4, Attending = $5
        WHERE Id = $6
-       RETURNING *`,
+       RETURNING ${RSVP_COLUMNS}`,
       [name, familyMembers, phone, email, attending, rsvpId]
     );
 

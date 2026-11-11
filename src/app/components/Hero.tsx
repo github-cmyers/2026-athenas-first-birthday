@@ -1,5 +1,7 @@
 import { Balloon, Bunting, PartyOwl, Snowfall } from "./decor";
-import { formatEventDate, formatEventTime, partyDate } from "@/lib/event";
+import LanguageToggle from "./LanguageToggle";
+import { formatEventDate, formatEventTime, partyDate, type PartyPhase } from "@/lib/event";
+import { getMessages, type Lang } from "@/lib/i18n";
 
 // Each letter of the giant "ONE!" gets its own colour and resting tilt; the
 // bob animation sits on an inner span so it doesn't fight the tilt.
@@ -10,9 +12,32 @@ const LETTERS = [
   { char: "!", color: "text-periwinkle", tilt: "rotate-6", delay: "-1.8s" },
 ];
 
-export default function Hero() {
-  const date = formatEventDate(partyDate);
-  const time = formatEventTime(partyDate);
+export default function Hero({
+  lang,
+  phase,
+  toggleHref,
+}: {
+  lang: Lang;
+  phase: PartyPhase;
+  toggleHref: string;
+}) {
+  const t = getMessages(lang).hero;
+  const date = formatEventDate(partyDate, lang);
+  const time = formatEventTime(partyDate, lang);
+
+  // The two buttons point at whatever matters most right now.
+  const buttons =
+    phase === "after"
+      ? [{ href: "#gallery", label: t.photos, primary: true }]
+      : phase === "party-day"
+        ? [
+            { href: "#schedule", label: t.schedule, primary: true },
+            { href: "#details", label: t.details, primary: false },
+          ]
+        : [
+            { href: "#rsvp", label: t.rsvp, primary: true },
+            { href: "#details", label: t.details, primary: false },
+          ];
 
   return (
     <header className="relative overflow-hidden pb-20">
@@ -21,6 +46,8 @@ export default function Hero() {
         <Bunting flags={9} className="flex-1" />
         <Bunting flags={9} offset={3} className="hidden flex-1 md:block" />
       </div>
+
+      <LanguageToggle lang={lang} href={toggleHref} className="absolute right-3 top-3 z-20 md:right-5 md:top-4" />
 
       <Snowfall count={30} />
 
@@ -33,9 +60,10 @@ export default function Hero() {
       </div>
 
       <div className="relative z-10 mx-auto max-w-4xl px-4 text-center">
-        <span className="chip -rotate-3 bg-ice text-base">You&apos;re invited! ❄️</span>
+        <span className="chip -rotate-3 bg-ice text-base">{t.chip[phase]}</span>
 
-        <p className="mt-6 font-display text-3xl font-semibold text-ink md:text-5xl">
+        {/* Kept in English in every language - see i18n.ts */}
+        <p lang="en" className="mt-6 font-display text-3xl font-semibold text-ink md:text-5xl">
           Look whooo&apos;s turning
         </p>
 
@@ -55,29 +83,32 @@ export default function Hero() {
           <PartyOwl className="w-24 shrink-0 origin-bottom animate-wobble md:w-44" />
         </div>
 
-        <h1 className="mt-6 font-display text-3xl font-bold text-ink md:text-5xl">
-          Athena&apos;s First Birthday
-        </h1>
-        <p className="mx-auto mt-3 max-w-xl text-lg text-ink/80 md:text-xl">
-          Join us for a Winter ONEderland celebration as our baby girl
-          turns one!
-        </p>
+        <h1 className="mt-6 font-display text-3xl font-bold text-ink md:text-5xl">{t.title}</h1>
+        <p className="mx-auto mt-3 max-w-xl text-lg text-ink/80 md:text-xl">{t.subtitle[phase]}</p>
 
         {/* Date and time stack on phones; the separator only makes sense
-            when they sit side by side. */}
+            when they sit side by side. On the day itself, "Today" replaces
+            the date. */}
         <p className="mt-6 inline-flex flex-col items-center gap-0.5 rounded-2xl border-[3px] border-ink bg-white px-5 py-2 font-display text-lg font-medium text-ink shadow-[4px_4px_0_0_var(--color-ink)] sm:flex-row sm:gap-3">
-          <span>📅 {date}</span>
-          <span aria-hidden="true" className="hidden text-sky sm:inline">✦</span>
-          <span>⏰ {time}</span>
+          <span>📅 {phase === "party-day" ? t.today : date}</span>
+          {phase !== "after" && (
+            <>
+              <span aria-hidden="true" className="hidden text-sky sm:inline">✦</span>
+              <span>⏰ {time}</span>
+            </>
+          )}
         </p>
 
         <div className="mt-8 flex flex-wrap justify-center gap-4">
-          <a href="#rsvp" className="btn-chunky bg-blush text-lg">
-            RSVP now 💌
-          </a>
-          <a href="#details" className="btn-chunky bg-white text-lg">
-            Party details
-          </a>
+          {buttons.map((button) => (
+            <a
+              key={button.href}
+              href={button.href}
+              className={`btn-chunky text-lg ${button.primary ? "bg-blush" : "bg-white"}`}
+            >
+              {button.label}
+            </a>
+          ))}
         </div>
       </div>
     </header>

@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { getMessages, type Lang } from "@/lib/i18n";
 
 interface AddToCalendarProps {
+  lang: Lang;
   title: string;
   description: string;
   location: string;
@@ -11,6 +13,7 @@ interface AddToCalendarProps {
 }
 
 export default function AddToCalendar({
+  lang,
   title,
   description,
   location,
@@ -18,6 +21,7 @@ export default function AddToCalendar({
   endDate,
 }: AddToCalendarProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const t = getMessages(lang).calendar;
 
   // UTC stamp (YYYYMMDDTHHMMSSZ) understood by both Google Calendar and ICS.
   // The ICS half used to emit local wall-clock digits with no zone, which made
@@ -108,7 +112,7 @@ export default function AddToCalendar({
             d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
           />
         </svg>
-        Add to Calendar
+        {t.button}
         <svg
           className={`w-4 h-4 transition-transform ${isOpen ? "rotate-180" : ""}`}
           fill="none"
@@ -154,7 +158,7 @@ export default function AddToCalendar({
                   d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                 />
               </svg>
-              Google Calendar
+              {t.google}
             </a>
 
             <a
@@ -170,7 +174,7 @@ export default function AddToCalendar({
                   d="M24 7.387v10.478c0 .23-.08.424-.238.576-.158.154-.352.23-.58.23h-8.547v-6.959l1.6 1.229c.102.086.225.129.37.129.146 0 .268-.043.37-.129l6.63-5.098c.09-.074.17-.11.24-.11.12 0 .18.074.18.22v-.566h-.025zm-.238-1.058c.158.152.238.346.238.576v.145l-7.203 5.531-2.16-1.652V4.67h8.547c.228 0 .42.077.578.23v.43zM14.637 4.67v6.16l-2.16 1.652-7.203-5.53v-.146c0-.23.08-.424.238-.576.159-.153.35-.23.578-.23h8.547zM5.512 6.93v.565c0 .147.059.22.176.22.07 0 .15.037.242.11l6.629 5.099c.102.086.225.129.37.129.146 0 .268-.043.37-.129l1.602-1.23v6.96H.818c-.228 0-.422-.077-.58-.23-.159-.152-.238-.346-.238-.576V7.37c0-.23.08-.424.238-.576.158-.153.352-.23.58-.23h4.455l.24.366z"
                 />
               </svg>
-              Outlook
+              {t.outlook}
             </a>
 
             <button
@@ -185,8 +189,8 @@ export default function AddToCalendar({
                   d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
                 />
               </svg>
-              Download .ics file
-              <span className="text-xs font-normal text-ink/50 ml-auto">Apple / Other</span>
+              {t.ics}
+              <span className="text-xs font-normal text-ink/50 ml-auto">{t.icsHint}</span>
             </button>
           </div>
         </>

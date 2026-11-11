@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from "react";
 import type { RsvpRow } from "@/lib/rsvp";
 import { EVENT_TIME_ZONE, MAX_FAMILY_MEMBERS, telHref } from "@/lib/event";
 import { downloadCsv } from "@/lib/csv";
+import { countPicks, describeAnswer, PREDICTION_QUESTIONS, type PredictionAnswers } from "@/lib/predictions";
 
 type Filter = "all" | "attending" | "declined";
 
@@ -41,6 +42,15 @@ function matchesSearch(rsvp: RsvpRow, search: string): boolean {
 
 function headcount(rsvps: RsvpRow[]): number {
   return rsvps.reduce((sum, r) => (r.attending ? sum + r.familymembers : sum), 0);
+}
+
+function hasPredictions(predictions: PredictionAnswers | null): predictions is PredictionAnswers {
+  return predictions !== null && countPicks(predictions) > 0;
+}
+
+// Hover text for the 🔮 next to a guest's name, one question per line.
+function predictionSummary(predictions: PredictionAnswers): string {
+  return PREDICTION_QUESTIONS.map((q) => `${q.short}: ${describeAnswer(predictions, q) || "—"}`).join("\n");
 }
 
 // Shared shell for the edit and delete dialogs: a dimmed backdrop that closes
@@ -482,12 +492,26 @@ export default function AdminPage() {
     [rsvps, filter, search]
   );
 
+  const predictionCount = useMemo(
+    () => rsvps.filter((r) => hasPredictions(r.predictions)).length,
+    [rsvps]
+  );
+
   // Exports exactly what is on screen, so filtering to "Attending" first
-  // gives the venue a ready-made guest list.
+  // gives the venue a ready-made guest list. Each guest's predictions follow,
+  // one column per question, as a keepsake.
   function handleExport() {
     const today = new Date().toISOString().slice(0, 10);
     downloadCsv(`athena-birthday-rsvps-${today}.csv`, [
-      ["Name", "Response", "Family members", "Phone", "Email", "Submitted (Eastern time)"],
+      [
+        "Name",
+        "Response",
+        "Family members",
+        "Phone",
+        "Email",
+        "Submitted (Eastern time)",
+        ...PREDICTION_QUESTIONS.map((q) => `Prediction: ${q.short}`),
+      ],
       ...visible.map((r) => [
         r.name,
         r.attending ? "Attending" : "Declined",
@@ -495,6 +519,7 @@ export default function AdminPage() {
         r.phone,
         r.email,
         formatSubmitted(r.createdat),
+        ...PREDICTION_QUESTIONS.map((q) => describeAnswer(r.predictions, q)),
       ]),
     ]);
   }
@@ -556,7 +581,19 @@ export default function AdminPage() {
             <h1 className="font-display text-3xl font-bold text-ink">Guest list</h1>
             <p className="text-ink/70">Athena&apos;s First Birthday RSVPs</p>
           </div>
-          <div className="flex gap-3">
+          <div className="flex flex-wrap gap-3">
+            <a href="/invite" target="_blank" rel="noopener" className="btn-chunky bg-ice py-2">
+              Printable invite
+            </a>
+            {/* Guests only see the results from party day; this previews them. */}
+            <a
+              href="/?preview=party-day#predictions"
+              target="_blank"
+              rel="noopener"
+              className="btn-chunky bg-periwinkle/60 py-2"
+            >
+              Prediction results
+            </a>
             <button
               onClick={fetchRSVPs}
               disabled={dataLoading}
@@ -679,7 +716,15 @@ export default function AdminPage() {
                     ) : (
                       visible.map((rsvp) => (
                         <tr key={rsvp.id} className="hover:bg-ice/20">
-                          <td className="px-5 py-4 text-sm font-semibold text-ink">{rsvp.name}</td>
+                          <td className="px-5 py-4 text-sm font-semibold text-ink">
+                            {rsvp.name}
+                            {hasPredictions(rsvp.predictions) && (
+                              <span title={predictionSummary(rsvp.predictions)} className="ml-1.5 cursor-help">
+                                <span aria-hidden="true">🔮</span>
+                                <span className="sr-only"> (made predictions)</span>
+                              </span>
+                            )}
+                          </td>
                           <td className="px-5 py-4 text-sm">
                             <span
                               className={`inline-block rounded-full px-3 py-1 text-xs font-semibold ${
@@ -743,6 +788,7 @@ export default function AdminPage() {
               <div className="border-t-2 border-ink/10 bg-lilac px-5 py-3 text-sm text-ink">
                 Showing {visible.length} of {rsvps.length} RSVP{rsvps.length !== 1 ? "s" : ""}
                 {visible.length !== rsvps.length && <> · {headcount(visible)} guests in this view</>}
+                {" "}· {predictionCount} made predictions
               </div>
             </div>
           </>

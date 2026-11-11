@@ -4,6 +4,8 @@ import { useState } from "react";
 import { MAX_FAMILY_MEMBERS } from "@/lib/event";
 import { BG, PARTY_COLORS } from "./decor";
 import RSVPClosed from "./RSVPClosed";
+import PredictionPrompt from "./PredictionPrompt";
+import { getMessages, type Lang, type Messages } from "@/lib/i18n";
 
 // Shared look for the text inputs and the select: a soft outline at rest that
 // firms up to full ink with a sky glow when focused.
@@ -118,10 +120,12 @@ function FloatingSelect({
 // Accept / decline choice, rendered as a real radio group so it is reachable
 // with the keyboard and announced correctly by screen readers.
 function AttendanceChoice({
+  t,
   attending,
   onChange,
   disabled,
 }: {
+  t: Messages["rsvpForm"];
   attending: boolean;
   onChange: (value: boolean) => void;
   disabled: boolean;
@@ -133,13 +137,13 @@ function AttendanceChoice({
     {
       value: true,
       icon: "🎉",
-      label: "Joyfully accepts",
+      label: t.accept,
       highlight: "peer-checked:bg-green-200",
     },
     {
       value: false,
       icon: "💌",
-      label: "Regretfully declines",
+      label: t.decline,
       highlight: "peer-checked:bg-blush/45",
     },
   ];
@@ -150,7 +154,7 @@ function AttendanceChoice({
   return (
     <fieldset disabled={disabled} className="border-0 p-0">
       <legend className="mb-3 px-1 font-display text-lg font-semibold text-ink">
-        Will you be joining us?
+        {t.question}
       </legend>
       <div className="grid grid-cols-2 gap-3">
         {options.map((option) => (
@@ -187,13 +191,17 @@ const CONFETTI_PIECES = Array.from({ length: 16 }, (_, i) => ({
   shape: i % 2 === 0 ? "h-2 w-3.5 rounded-sm" : "h-2.5 w-2.5 rounded-full",
 }));
 
-// Animated success component
+// Animated success component. `children` appear last, under the guest's name.
 function SuccessMessage({
+  t,
   name,
   attending,
+  children,
 }: {
+  t: Messages["success"];
   name: string;
   attending: boolean;
+  children?: React.ReactNode;
 }) {
   return (
     <div className="success-container sticker relative overflow-hidden p-8 text-center">
@@ -219,16 +227,17 @@ function SuccessMessage({
       <div className="relative z-10">
         <div className="icon-pop mb-4 text-6xl">{attending ? "☃️" : "💌"}</div>
         <h3 className="title-slide mb-3 font-display text-4xl font-bold text-ink">
-          Thank You!
+          {t.title}
         </h3>
         <p className="message-fade text-lg text-ink/80">
           {attending
-            ? "We can't wait to celebrate with you,"
-            : "We're sorry you can't make it, but thank you for letting us know,"}
+            ? t.accepted
+            : t.declined}
         </p>
         <p className="name-pop mt-1 font-display text-2xl font-semibold text-ink">
           {name}! {attending ? "🎉" : "💗"}
         </p>
+        {children && <div className="extra-fade mt-6">{children}</div>}
       </div>
 
       <style>{`
@@ -268,6 +277,10 @@ function SuccessMessage({
           animation: name-bounce 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.8s both;
         }
 
+        .extra-fade {
+          animation: fade-up 0.4s ease-out 1.1s both;
+        }
+
         @keyframes fade-up {
           0% { transform: translateY(10px); opacity: 0; }
           100% { transform: translateY(0); opacity: 1; }
@@ -296,7 +309,8 @@ function SuccessMessage({
   );
 }
 
-export default function RSVPForm() {
+export default function RSVPForm({ lang }: { lang: Lang }) {
+  const t = getMessages(lang).rsvpForm;
   const [formData, setFormData] = useState({
     name: "",
     familyMembers: "1",
@@ -305,6 +319,8 @@ export default function RSVPForm() {
   });
   const [attending, setAttending] = useState(true);
   const [submitted, setSubmitted] = useState(false);
+  // The key for adding predictions to this RSVP, from the server's reply.
+  const [predictionToken, setPredictionToken] = useState<string | null>(null);
   const [closed, setClosed] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -325,28 +341,33 @@ export default function RSVPForm() {
         }),
       });
 
+      const data = await response.json().catch(() => ({}));
+
       if (!response.ok) {
-        const data = await response.json().catch(() => ({}));
         // The deadline passed while this page was open.
         if (data.closed) {
           setClosed(true);
           return;
         }
-        // Validation messages from the server are written for guests.
+        // The server's validation messages are written for guests, but in
+        // English only; French guests get a general French prompt instead.
         setError(
-          response.status === 400 && data.error
-            ? data.error
-            : "Something went wrong. Please try again."
+          response.status === 400
+            ? lang === "en" && data.error
+              ? data.error
+              : t.checkDetails
+            : t.genericError
         );
         return;
       }
 
+      setPredictionToken(typeof data.predictionToken === "string" ? data.predictionToken : null);
       setSubmitted(true);
 
       // Notify other components that an RSVP was submitted
       window.dispatchEvent(new CustomEvent("rsvp-submitted"));
     } catch {
-      setError("Something went wrong. Please try again.");
+      setError(t.genericError);
     } finally {
       setLoading(false);
     }
@@ -361,11 +382,15 @@ export default function RSVPForm() {
   };
 
   if (submitted) {
-    return <SuccessMessage name={formData.name} attending={attending} />;
+    return (
+      <SuccessMessage t={getMessages(lang).success} name={formData.name} attending={attending}>
+        {predictionToken && <PredictionPrompt lang={lang} token={predictionToken} />}
+      </SuccessMessage>
+    );
   }
 
   if (closed) {
-    return <RSVPClosed />;
+    return <RSVPClosed lang={lang} />;
   }
 
   return (
@@ -380,7 +405,7 @@ export default function RSVPForm() {
         id="name"
         name="name"
         type="text"
-        label="Your Name"
+        label={t.name}
         value={formData.name}
         onChange={handleChange}
         disabled={loading}
@@ -388,6 +413,7 @@ export default function RSVPForm() {
       />
 
       <AttendanceChoice
+        t={t}
         attending={attending}
         onChange={setAttending}
         disabled={loading}
@@ -401,7 +427,7 @@ export default function RSVPForm() {
           <FloatingSelect
             id="familyMembers"
             name="familyMembers"
-            label="Number of your attending family members"
+            label={t.familyMembers}
             value={formData.familyMembers}
             onChange={handleChange}
             disabled={loading}
@@ -410,12 +436,12 @@ export default function RSVPForm() {
               const num = i + 1;
               return {
                 value: String(num),
-                label: num === 1 ? "1 (just me)" : String(num),
+                label: num === 1 ? t.justMe : String(num),
               };
             })}
           />
           <p id="familyMembers-hint" className="mt-1.5 px-1 text-sm text-ink/60">
-            Please include yourself in this number.
+            {t.includeYourself}
           </p>
         </div>
       )}
@@ -424,7 +450,7 @@ export default function RSVPForm() {
         id="phone"
         name="phone"
         type="tel"
-        label="Phone Number"
+        label={t.phone}
         value={formData.phone}
         onChange={handleChange}
         disabled={loading}
@@ -435,7 +461,7 @@ export default function RSVPForm() {
         id="email"
         name="email"
         type="email"
-        label="Email Address"
+        label={t.email}
         value={formData.email}
         onChange={handleChange}
         disabled={loading}
@@ -448,10 +474,10 @@ export default function RSVPForm() {
         className="btn-chunky w-full bg-blush py-4 text-xl"
       >
         {loading
-          ? "Submitting..."
+          ? t.submitting
           : attending
-            ? "RSVP Now! 💌"
-            : "Send Your Reply 💌"}
+            ? t.submitAccept
+            : t.submitDecline}
       </button>
     </form>
   );

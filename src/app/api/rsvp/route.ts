@@ -1,6 +1,13 @@
+import { randomUUID } from "crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { query } from "@/lib/db";
-import { ensureRsvpTable, parseRsvpInput, RSVP_TABLE, type RsvpRow } from "@/lib/rsvp";
+import {
+  ensureRsvpTable,
+  parseRsvpInput,
+  RSVP_COLUMNS,
+  RSVP_TABLE,
+  type RsvpRow,
+} from "@/lib/rsvp";
 import { isRsvpOpen } from "@/lib/event";
 import { isAuthenticated } from "@/lib/adminSession";
 
@@ -23,13 +30,19 @@ export async function POST(request: NextRequest) {
     }
     const { name, familyMembers, phone, email, attending } = parsed.value;
 
+    // The guest's key for adding their predictions to this RSVP afterwards
+    // (POST /api/predictions). Only this response ever reveals it, so nobody
+    // else can attach predictions to someone's reply.
+    const predictionToken = randomUUID();
+
     await ensureRsvpTable();
     await query(
-      `INSERT INTO ${RSVP_TABLE} (Name, FamilyMembers, Phone, Email, Attending) VALUES ($1, $2, $3, $4, $5)`,
-      [name, familyMembers, phone, email, attending]
+      `INSERT INTO ${RSVP_TABLE} (Name, FamilyMembers, Phone, Email, Attending, PredictionToken)
+       VALUES ($1, $2, $3, $4, $5, $6)`,
+      [name, familyMembers, phone, email, attending, predictionToken]
     );
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, predictionToken });
   } catch (error) {
     console.error("RSVP submission error:", error);
     return NextResponse.json(
@@ -49,7 +62,7 @@ export async function GET(request: NextRequest) {
   try {
     await ensureRsvpTable();
     const result = await query<RsvpRow>(
-      `SELECT * FROM ${RSVP_TABLE} ORDER BY CreatedAt DESC`
+      `SELECT ${RSVP_COLUMNS} FROM ${RSVP_TABLE} ORDER BY CreatedAt DESC`
     );
 
     return NextResponse.json(result.rows);

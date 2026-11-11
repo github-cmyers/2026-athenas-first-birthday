@@ -1,3 +1,5 @@
+import type { Lang } from "./i18n";
+
 // Single source of truth for when the party happens: Saturday, December 19th.
 //
 // TODO: confirm the start time - 4:00 PM is still a placeholder.
@@ -41,6 +43,16 @@ export const HOST = {
   phone: "401-499-8727",
 };
 
+// Where the party is. The coordinates only feed the weather forecast, so the
+// town's are close enough - a forecast grid cell is several miles across.
+// TODO: confirm the venue - this is still the naming ceremony's. If it
+// changes, update the coordinates to the new town too.
+export const VENUE = {
+  address: "Jacky's Galaxie and Sushi Bar, 1488 Mineral Spring Ave, North Providence, RI 02904",
+  latitude: 41.85, // North Providence, RI
+  longitude: -71.47,
+};
+
 // e.g. "tel:4014998727"
 export function telHref(phone: string): string {
   return `tel:${phone.replace(/[^0-9+]/g, "")}`;
@@ -65,8 +77,17 @@ function ordinalSuffix(day: number): string {
   }
 }
 
-// e.g. "October 10th, 2026"
-export function formatEventDate(date: Date): string {
+// e.g. "October 10th, 2026", or "10 octobre 2026" in French
+export function formatEventDate(date: Date, lang: Lang = "en"): string {
+  if (lang === "fr") {
+    return new Intl.DateTimeFormat("fr-FR", {
+      timeZone: EVENT_TIME_ZONE,
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    }).format(date);
+  }
+
   const parts = new Intl.DateTimeFormat("en-US", {
     timeZone: EVENT_TIME_ZONE,
     month: "long",
@@ -81,12 +102,82 @@ export function formatEventDate(date: Date): string {
   return `${part("month")} ${day}${ordinalSuffix(day)}, ${part("year")}`;
 }
 
-// e.g. "4:00 PM"
-export function formatEventTime(date: Date): string {
-  return new Intl.DateTimeFormat("en-US", {
+// e.g. "4:00 PM", or "16:00" in French
+export function formatEventTime(date: Date, lang: Lang = "en"): string {
+  return new Intl.DateTimeFormat(lang === "fr" ? "fr-FR" : "en-US", {
     timeZone: EVENT_TIME_ZONE,
     hour: "numeric",
     minute: "2-digit",
-    hour12: true,
+    hour12: lang !== "fr",
   }).format(date);
 }
+
+// The calendar day a moment falls on where the party is, e.g. "2026-12-19".
+export function eventDay(date: Date): string {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: EVENT_TIME_ZONE,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(date);
+}
+
+// The page changes shape around the party:
+// - "upcoming": the invitation, RSVP form and countdown.
+// - "party-day": from midnight on the day (Eastern) until the party ends,
+//   with the day's schedule up top. RSVPs still close at the start time.
+// - "after": once the party is over, a thank-you replaces the invitation.
+export type PartyPhase = "upcoming" | "party-day" | "after";
+
+export const PARTY_PHASES: PartyPhase[] = ["upcoming", "party-day", "after"];
+
+export function isPartyPhase(value: unknown): value is PartyPhase {
+  return PARTY_PHASES.includes(value as PartyPhase);
+}
+
+export const PARTY_END = new Date(partyDate.getTime() + PARTY_DURATION_HOURS * 60 * 60 * 1000);
+
+export function partyPhase(now: Date = new Date()): PartyPhase {
+  if (now >= PARTY_END) return "after";
+  if (eventDay(now) === eventDay(partyDate)) return "party-day";
+  return "upcoming";
+}
+
+// The plan for the day, shown on the page on party day. Times are minutes
+// after the start, so the schedule moves with partyDate if the start time
+// changes.
+//
+// TODO: this is a draft - replace it with the real plan.
+export interface ScheduleItem {
+  minutes: number;
+  en: { title: string; detail?: string };
+  fr: { title: string; detail?: string };
+}
+
+export const PARTY_SCHEDULE: ScheduleItem[] = [
+  {
+    minutes: 0,
+    en: { title: "Arrivals & hellos", detail: "Find a seat and say hi to the birthday girl" },
+    fr: { title: "Arrivée des invités", detail: "Installez-vous et venez dire bonjour à la reine du jour" },
+  },
+  {
+    minutes: 30,
+    en: { title: "Food & drinks" },
+    fr: { title: "Repas et boissons" },
+  },
+  {
+    minutes: 90,
+    en: { title: "Happy birthday & cake", detail: "Sing along as Athena meets her first birthday cake" },
+    fr: { title: "Joyeux anniversaire et gâteau", detail: "Chantons ensemble pendant qu'Athena découvre son premier gâteau" },
+  },
+  {
+    minutes: 120,
+    en: { title: "Photos with Athena" },
+    fr: { title: "Photos avec Athena" },
+  },
+  {
+    minutes: 165,
+    en: { title: "Goodbyes & hugs" },
+    fr: { title: "Au revoir et câlins" },
+  },
+];

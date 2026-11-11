@@ -1,5 +1,6 @@
 import { query } from "./db";
 import { MAX_FAMILY_MEMBERS } from "./event";
+import type { PredictionAnswers } from "./predictions";
 
 // The birthday gets its own table rather than reusing the naming ceremony's.
 // The site may be pointed at the same database, and sharing a table would
@@ -22,11 +23,34 @@ export interface RsvpRow {
   email: string;
   attending: boolean;
   createdat: string;
+  // The guest's picks for "Predictions for Athena", or null if they skipped
+  // them (or replied before predictions existed).
+  predictions: PredictionAnswers | null;
 }
+
+// What the admin API returns. Deliberately not `*`: PredictionToken is the
+// guest's one-time key for attaching predictions and is never sent back out.
+export const RSVP_COLUMNS =
+  "Id, Name, FamilyMembers, Phone, Email, Attending, CreatedAt, Predictions";
 
 // Both the RSVP routes and the count route need this table, so the definition
 // lives in one place rather than being copy-pasted into each handler.
-export async function ensureRsvpTable() {
+//
+// Predictions and PredictionToken were added after the first RSVPs came in,
+// so they are added to an existing table too. The work is done once per
+// server process (ALTER TABLE takes a lock even when there is nothing to add);
+// a failure clears the cached attempt so the next request tries again.
+let tableReady: Promise<void> | null = null;
+
+export function ensureRsvpTable(): Promise<void> {
+  tableReady ??= createRsvpTable().catch((error) => {
+    tableReady = null;
+    throw error;
+  });
+  return tableReady;
+}
+
+async function createRsvpTable() {
   await query(`
     CREATE TABLE IF NOT EXISTS ${RSVP_TABLE} (
       Id SERIAL PRIMARY KEY,
@@ -38,6 +62,20 @@ export async function ensureRsvpTable() {
       CreatedAt TIMESTAMPTZ NOT NULL DEFAULT NOW()
     )
   `);
+  await query(`
+    ALTER TABLE ${RSVP_TABLE}
+      ADD COLUMN IF NOT EXISTS Predictions JSONB,
+      ADD COLUMN IF NOT EXISTS PredictionToken UUID
+  `);
+}
+
+// Every guest's predictions, for the results shown on party day.
+export async function loadAllPredictions(): Promise<PredictionAnswers[]> {
+  await ensureRsvpTable();
+  const result = await query<{ predictions: PredictionAnswers }>(
+    `SELECT Predictions FROM ${RSVP_TABLE} WHERE Predictions IS NOT NULL`
+  );
+  return result.rows.map((row) => row.predictions);
 }
 
 export interface RsvpInput {

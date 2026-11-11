@@ -3,14 +3,15 @@
 import { useState, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
 import Image from "next/image";
+import { getMessages, type Lang } from "@/lib/i18n";
 
 const dummyImages = [
-  { id: 1, src: "/photos/1.JPG", alt: "Photo 1" },
-  { id: 2, src: "/photos/2.jpg", alt: "Photo 2" },
-  { id: 3, src: "/photos/3.jpg", alt: "Photo 3" },
-  { id: 4, src: "/photos/4.JPG", alt: "Photo 4" },
-  { id: 5, src: "/photos/5.JPG", alt: "Photo 5" },
-  { id: 6, src: "/photos/6.JPG", alt: "Photo 6" },
+  { id: 1, src: "/photos/1.JPG" },
+  { id: 2, src: "/photos/2.jpg" },
+  { id: 3, src: "/photos/3.jpg" },
+  { id: 4, src: "/photos/4.JPG" },
+  { id: 5, src: "/photos/5.JPG" },
+  { id: 6, src: "/photos/6.JPG" },
 ];
 
 // Each polaroid rests at its own slight angle with a strip of coloured tape.
@@ -24,7 +25,8 @@ const POLAROID_STYLES = [
   { tilt: "rotate-1", tape: "bg-sky/60" },
 ];
 
-export default function ImageGallery() {
+export default function ImageGallery({ lang }: { lang: Lang }) {
+  const t = getMessages(lang).gallery;
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [mounted, setMounted] = useState(false);
 
@@ -78,7 +80,7 @@ export default function ImageGallery() {
               type="button"
               key={image.id}
               onClick={() => openLightbox(index)}
-              aria-label={`Open ${image.alt}`}
+              aria-label={t.open(t.photo(index + 1))}
               className={`group relative cursor-pointer rounded-md border-[3px] border-ink bg-white p-2 pb-8 shadow-[5px_5px_0_0_var(--color-ink)] transition-transform duration-300 hover:z-10 hover:rotate-0 hover:scale-[1.04] focus-visible:rotate-0 focus-visible:outline-[3px] focus-visible:outline-offset-4 focus-visible:outline-sky md:p-3 md:pb-12 ${style.tilt}`}
             >
               <span
@@ -88,7 +90,7 @@ export default function ImageGallery() {
               <div className="relative aspect-[3/4] overflow-hidden rounded-sm border-2 border-ink">
                 <Image
                   src={image.src}
-                  alt={image.alt}
+                  alt={t.photo(index + 1)}
                   fill
                   className="object-cover transition-transform duration-500 group-hover:scale-105"
                   unoptimized
@@ -112,7 +114,7 @@ export default function ImageGallery() {
           >
             <Image
               src={selectedImage.src.replace("400/300", "1200/900")}
-              alt={selectedImage.alt}
+              alt={t.photo(selectedIndex! + 1)}
               fill
               className="object-contain rounded-xl"
               unoptimized
@@ -120,7 +122,7 @@ export default function ImageGallery() {
 
             {/* Image caption */}
             <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-4 rounded-b-xl">
-              <p className="text-white text-center">{selectedImage.alt}</p>
+              <p className="text-white text-center">{t.photo(selectedIndex! + 1)}</p>
               <p className="text-white/60 text-sm text-center mt-1">
                 {selectedIndex! + 1} / {dummyImages.length}
               </p>
@@ -134,7 +136,7 @@ export default function ImageGallery() {
               goToPrevious();
             }}
             className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/20 hover:bg-white/40 rounded-full flex items-center justify-center text-white text-2xl transition-all duration-300 hover:scale-110 z-10"
-            aria-label="Previous image"
+            aria-label={t.previous}
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -148,7 +150,7 @@ export default function ImageGallery() {
               goToNext();
             }}
             className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/20 hover:bg-white/40 rounded-full flex items-center justify-center text-white text-2xl transition-all duration-300 hover:scale-110 z-10"
-            aria-label="Next image"
+            aria-label={t.next}
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -162,7 +164,7 @@ export default function ImageGallery() {
               closeLightbox();
             }}
             className="absolute top-4 right-4 w-12 h-12 bg-white/20 hover:bg-white/40 rounded-full flex items-center justify-center text-white text-2xl transition-all duration-300 hover:scale-110"
-            aria-label="Close lightbox"
+            aria-label={t.close}
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -186,7 +188,7 @@ export default function ImageGallery() {
               >
                 <Image
                   src={image.src}
-                  alt={image.alt}
+                  alt={t.photo(index + 1)}
                   fill
                   className="object-cover"
                   unoptimized

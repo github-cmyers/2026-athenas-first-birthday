@@ -1,12 +1,15 @@
 import { telHref } from "@/lib/event";
+import { getMessages, type Lang } from "@/lib/i18n";
 
 interface PromoProps {
+  lang: Lang;
   name: string;
   phone: string;
   email?: string;
 }
 
-export default function Promo({ phone, email }: PromoProps) {
+export default function Promo({ lang, phone, email }: PromoProps) {
+  const t = getMessages(lang).promo;
   const phoneLink = telHref(phone);
   const emailLink = email ? `mailto:${email}` : null;
 
@@ -24,13 +27,11 @@ export default function Promo({ phone, email }: PromoProps) {
         {/* Content */}
         <div className="relative p-8 text-center md:p-10">
           <span className="chip mb-5 rotate-2 border-snow bg-ice shadow-none">
-            Colin&apos;s Side Hustle
+            {t.badge}
           </span>
 
           <h2 className="mb-6 font-display text-xl font-medium leading-snug text-snow md:text-2xl">
-            This website was built by Ethan &amp; Athena&apos;s Dad. If
-            you&apos;re interested in me building you one of your own tailored
-            exactly to your needs at a fair price, feel free to reach out.
+            {t.text}
           </h2>
 
           {/* CTA Button */}

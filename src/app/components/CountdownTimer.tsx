@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { SnowCap } from "./decor";
+import { getMessages, type Lang } from "@/lib/i18n";
 
 interface TimeLeft {
   days: number;
@@ -11,23 +12,25 @@ interface TimeLeft {
 }
 
 interface CountdownTimerProps {
+  lang: Lang;
   targetDate: Date;
 }
 
 // One snow-capped block per unit, each its own colour and resting tilt.
 const BLOCKS = [
-  { label: "Days", style: "bg-blush -rotate-3" },
-  { label: "Hours", style: "bg-sky rotate-2" },
-  { label: "Minutes", style: "bg-glacier -rotate-2" },
-  { label: "Seconds", style: "bg-periwinkle rotate-3" },
+  { unit: "days", style: "bg-blush -rotate-3" },
+  { unit: "hours", style: "bg-sky rotate-2" },
+  { unit: "minutes", style: "bg-glacier -rotate-2" },
+  { unit: "seconds", style: "bg-periwinkle rotate-3" },
 ] as const;
 
-function Blocks({ values }: { values: (number | null)[] }) {
+function Blocks({ lang, values }: { lang: Lang; values: (number | null)[] }) {
+  const t = getMessages(lang).countdown;
   return (
     <div className="mx-auto grid max-w-xl grid-cols-4 gap-3 pt-2 md:gap-6">
       {BLOCKS.map((block, i) => (
         <div
-          key={block.label}
+          key={block.unit}
           className={`relative flex aspect-square flex-col items-center justify-center rounded-2xl border-[3px] border-ink text-ink shadow-[5px_5px_0_0_var(--color-snow)] ${block.style}`}
         >
           {/* Offsets put the cap's outline on the block's top border line:
@@ -37,7 +40,7 @@ function Blocks({ values }: { values: (number | null)[] }) {
             {values[i] === null ? "--" : String(values[i]).padStart(2, "0")}
           </div>
           <div className="mt-0.5 text-[0.65rem] font-bold uppercase tracking-wider md:text-sm">
-            {block.label}
+            {t[block.unit]}
           </div>
         </div>
       ))}
@@ -45,7 +48,7 @@ function Blocks({ values }: { values: (number | null)[] }) {
   );
 }
 
-export default function CountdownTimer({ targetDate }: CountdownTimerProps) {
+export default function CountdownTimer({ lang, targetDate }: CountdownTimerProps) {
   const [timeLeft, setTimeLeft] = useState<TimeLeft | null>(null);
   const [hasMounted, setHasMounted] = useState(false);
 
@@ -77,19 +80,20 @@ export default function CountdownTimer({ targetDate }: CountdownTimerProps) {
   }, [targetDate]);
 
   if (!hasMounted) {
-    return <Blocks values={[null, null, null, null]} />;
+    return <Blocks lang={lang} values={[null, null, null, null]} />;
   }
 
   if (!timeLeft) {
     return (
       <div className="text-center font-display text-3xl font-semibold text-snow">
-        The party has begun! 🎉
+        {getMessages(lang).countdown.started}
       </div>
     );
   }
 
   return (
     <Blocks
+      lang={lang}
       values={[timeLeft.days, timeLeft.hours, timeLeft.minutes, timeLeft.seconds]}
     />
   );
