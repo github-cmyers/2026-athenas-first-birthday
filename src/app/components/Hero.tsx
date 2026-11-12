@@ -27,7 +27,7 @@ export default function Hero({
   const time = formatEventTime(partyDate, lang);
 
   return (
-    <header className="relative overflow-hidden pb-20">
+    <header className="relative overflow-hidden pb-10 md:pb-14">
       {/* Two swags of bunting on wide screens, one on phones */}
       <div className="relative z-10 flex">
         <Bunting flags={9} className="flex-1" />
