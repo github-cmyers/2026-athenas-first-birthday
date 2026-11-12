@@ -33,10 +33,6 @@ const en = {
       after: "Thank you for helping us celebrate our baby girl's first birthday!",
     },
     today: "Today",
-    rsvp: "RSVP now 💌",
-    details: "Party details",
-    schedule: "Today's schedule",
-    photos: "See the photos",
     // Tapping the owl: a speech bubble, a different line each tap.
     owlLabel: "Say hi to the owl",
     hoots: [
@@ -271,10 +267,6 @@ const fr: Messages = typesetFrench({
       after: "Merci d'avoir fêté avec nous le premier anniversaire de notre petite fille !",
     },
     today: "Aujourd'hui",
-    rsvp: "Répondre 💌",
-    details: "Infos pratiques",
-    schedule: "Programme du jour",
-    photos: "Voir les photos",
     owlLabel: "Dites bonjour à la chouette",
     hoots: [
       "Hou hou ! 🦉",

@@ -4,7 +4,6 @@ import { getMessages, type Lang } from "@/lib/i18n";
 // Takes the place of the invitation once the party is over.
 export default function ThankYou({ lang }: { lang: Lang }) {
   const t = getMessages(lang).thankYou;
-  const photos = getMessages(lang).hero.photos;
 
   return (
     <section className="mx-auto mb-20 max-w-3xl px-4">
@@ -16,9 +15,6 @@ export default function ThankYou({ lang }: { lang: Lang }) {
           <p>{t.p1}</p>
           <p>{t.p2}</p>
           <p className="font-display text-xl font-semibold text-ink">{t.signoff} 💙</p>
-          <a href="#gallery" className="btn-chunky bg-ice">
-            {photos}
-          </a>
         </div>
       </div>
     </section>

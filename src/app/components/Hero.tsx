@@ -26,20 +26,6 @@ export default function Hero({
   const date = formatEventDate(partyDate, lang);
   const time = formatEventTime(partyDate, lang);
 
-  // The two buttons point at whatever matters most right now.
-  const buttons =
-    phase === "after"
-      ? [{ href: "#gallery", label: t.photos, primary: true }]
-      : phase === "party-day"
-        ? [
-            { href: "#schedule", label: t.schedule, primary: true },
-            { href: "#details", label: t.details, primary: false },
-          ]
-        : [
-            { href: "#rsvp", label: t.rsvp, primary: true },
-            { href: "#details", label: t.details, primary: false },
-          ];
-
   return (
     <header className="relative overflow-hidden pb-20">
       {/* Two swags of bunting on wide screens, one on phones */}
@@ -99,18 +85,6 @@ export default function Hero({
             </>
           )}
         </p>
-
-        <div className="mt-8 flex flex-wrap justify-center gap-4">
-          {buttons.map((button) => (
-            <a
-              key={button.href}
-              href={button.href}
-              className={`btn-chunky text-lg ${button.primary ? "bg-blush" : "bg-white"}`}
-            >
-              {button.label}
-            </a>
-          ))}
-        </div>
       </div>
     </header>
   );
