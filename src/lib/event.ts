@@ -77,7 +77,7 @@ function ordinalSuffix(day: number): string {
   }
 }
 
-// e.g. "October 10th, 2026", or "10 octobre 2026" in French
+// e.g. "December 19th, 2026", or "19 décembre 2026" in French
 export function formatEventDate(date: Date, lang: Lang = "en"): string {
   if (lang === "fr") {
     return new Intl.DateTimeFormat("fr-FR", {
