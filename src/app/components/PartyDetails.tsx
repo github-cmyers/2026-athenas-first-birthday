@@ -3,7 +3,7 @@ import { SectionHeading } from "./decor";
 import {
   PARTY_DURATION_HOURS,
   formatEventDate,
-  formatEventTime,
+  formatEventTimeRange,
 } from "@/lib/event";
 import { getMessages, type Lang } from "@/lib/i18n";
 
@@ -57,16 +57,16 @@ export default function PartyDetails({
 
   // Derived from startDate rather than passed in, so the text shown to guests
   // and the time in the calendar invite can never drift apart.
+  const endDate = new Date(startDate.getTime() + durationHours * 60 * 60 * 1000);
   const date = formatEventDate(startDate, lang);
-  const time = formatEventTime(startDate, lang);
+  const time = formatEventTimeRange(startDate, endDate, lang);
 
-  // "Venue, street, town" reads better with the venue on its own line.
+  // The first part of the address gets its own line: a venue name, or the
+  // street when there isn't one ("171 Jenckes Hill Rd" / "Lincoln, RI").
   const [venue, ...rest] = address.split(",");
   const street = rest.join(",").trim();
 
   const mapsEmbedUrl = `https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8&q=${encodeURIComponent(address)}`;
-
-  const endDate = new Date(startDate.getTime() + durationHours * 60 * 60 * 1000);
 
   return (
     <section id="details" className="mx-auto mb-20 max-w-3xl scroll-mt-6 px-4">

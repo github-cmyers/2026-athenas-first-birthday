@@ -3,7 +3,7 @@ import { toString as qrToSvg } from "qrcode";
 import { Bunting, OWL_COLORS, PartyOwl } from "../components/decor";
 import LanguageToggle from "../components/LanguageToggle";
 import PrintButton from "./PrintButton";
-import { formatEventDate, formatEventTime, partyDate, VENUE } from "@/lib/event";
+import { formatEventDate, formatEventTimeRange, PARTY_END, partyDate, VENUE } from "@/lib/event";
 import { getMessages } from "@/lib/i18n";
 import { firstParam, hrefWithLang, resolveLang, type SearchParams } from "@/lib/lang";
 import { siteUrl } from "@/lib/site";
@@ -95,7 +95,7 @@ export default async function InvitePage({ searchParams }: { searchParams: Promi
           <div>
             <h1 className="font-display text-[1.75rem] font-bold leading-tight">{t.hero.title}</h1>
             <p className="mt-2 font-display text-lg font-medium">
-              {formatEventDate(partyDate, lang)} · {formatEventTime(partyDate, lang)}
+              {formatEventDate(partyDate, lang)} · {formatEventTimeRange(partyDate, PARTY_END, lang)}
             </p>
             <p className="mt-2 text-sm leading-snug text-ink/80">{VENUE.address}</p>
           </div>

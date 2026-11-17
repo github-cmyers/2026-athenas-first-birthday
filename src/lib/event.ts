@@ -1,17 +1,17 @@
 import type { Lang } from "./i18n";
 
-// Single source of truth for when the party happens: Saturday, December 19th.
+// Single source of truth for when the party happens: Saturday, December 19th,
+// 3:00 PM to 8:00 PM.
 //
-// TODO: confirm the start time - 4:00 PM is still a placeholder.
-//
-// The offset is explicit on purpose. A bare "2026-12-19T16:00:00" is parsed in
+// The offset is explicit on purpose. A bare "2026-12-19T15:00:00" is parsed in
 // whatever timezone the process happens to run in, so the same code produced
-// 4:00 PM on a developer machine in Eastern and noon Eastern inside the
+// 3:00 PM on a developer machine in Eastern and 10:00 AM Eastern inside the
 // production container, which runs UTC. -05:00 is EST, in effect on Dec 19;
 // use -04:00 for a date between mid-March and early November (EDT).
-export const partyDate = new Date("2026-12-19T16:00:00-05:00");
+export const partyDate = new Date("2026-12-19T15:00:00-05:00");
 
-export const PARTY_DURATION_HOURS = 3;
+// 3:00 PM to 8:00 PM.
+export const PARTY_DURATION_HOURS = 5;
 
 // RSVPs close on their own when the party starts.
 export const RSVP_CLOSES_AT = partyDate;
@@ -43,14 +43,13 @@ export const HOST = {
   phone: "401-499-8727",
 };
 
-// Where the party is. The coordinates only feed the weather forecast, so the
-// town's are close enough - a forecast grid cell is several miles across.
-// TODO: confirm the venue - this is still the naming ceremony's. If it
-// changes, update the coordinates to the new town too.
+// Where the party is. The coordinates only feed the weather, so the town's
+// are close enough - a forecast grid cell is several miles across. If the
+// town changes, update them and recompute SNOW_HISTORY in forecast.ts.
 export const VENUE = {
-  address: "Jacky's Galaxie and Sushi Bar, 1488 Mineral Spring Ave, North Providence, RI 02904",
-  latitude: 41.85, // North Providence, RI
-  longitude: -71.47,
+  address: "171 Jenckes Hill Rd, Lincoln, RI 02865",
+  latitude: 41.92, // Lincoln, RI
+  longitude: -71.44,
 };
 
 // e.g. "tel:4014998727"
@@ -102,7 +101,22 @@ export function formatEventDate(date: Date, lang: Lang = "en"): string {
   return `${part("month")} ${day}${ordinalSuffix(day)}, ${part("year")}`;
 }
 
-// e.g. "4:00 PM", or "16:00" in French
+// e.g. "3:00 – 8:00 PM" (or "11:00 AM – 2:00 PM" across noon), or
+// "15:00 – 20:00" in French. Built from formatEventTime rather than
+// Intl's formatRange so the spacing and dash are plain characters the
+// link-preview image's font is sure to have.
+export function formatEventTimeRange(start: Date, end: Date, lang: Lang = "en"): string {
+  const from = formatEventTime(start, lang);
+  const to = formatEventTime(end, lang);
+  if (lang === "en" && from.slice(-2) === to.slice(-2)) {
+    // Same AM/PM: say it once, at the end. Drops the period and the
+    // (no-break) space before it.
+    return `${from.slice(0, -3)} – ${to}`;
+  }
+  return `${from} – ${to}`;
+}
+
+// e.g. "3:00 PM", or "15:00" in French
 export function formatEventTime(date: Date, lang: Lang = "en"): string {
   return new Intl.DateTimeFormat(lang === "fr" ? "fr-FR" : "en-US", {
     timeZone: EVENT_TIME_ZONE,
@@ -145,9 +159,11 @@ export function partyPhase(now: Date = new Date()): PartyPhase {
 
 // The plan for the day, shown on the page on party day. Times are minutes
 // after the start, so the schedule moves with partyDate if the start time
-// changes.
+// changes. Each item runs until the next one starts, the last until the party
+// ends, and the one under way is highlighted.
 //
-// TODO: this is a draft - replace it with the real plan.
+// For now it's a single entry covering the whole party; add items here to
+// give the day a fuller plan.
 export interface ScheduleItem {
   minutes: number;
   en: { title: string; detail?: string };
@@ -157,27 +173,7 @@ export interface ScheduleItem {
 export const PARTY_SCHEDULE: ScheduleItem[] = [
   {
     minutes: 0,
-    en: { title: "Arrivals & hellos", detail: "Find a seat and say hi to the birthday girl" },
-    fr: { title: "Arrivée des invités", detail: "Installez-vous et venez dire bonjour à la reine du jour" },
-  },
-  {
-    minutes: 30,
-    en: { title: "Food & drinks" },
-    fr: { title: "Repas et boissons" },
-  },
-  {
-    minutes: 90,
-    en: { title: "Happy birthday & cake", detail: "Sing along as Athena meets her first birthday cake" },
-    fr: { title: "Joyeux anniversaire et gâteau", detail: "Chantons ensemble pendant qu'Athena découvre son premier gâteau" },
-  },
-  {
-    minutes: 120,
-    en: { title: "Photos with Athena" },
-    fr: { title: "Photos avec Athena" },
-  },
-  {
-    minutes: 165,
-    en: { title: "Goodbyes & hugs" },
-    fr: { title: "Au revoir et câlins" },
+    en: { title: "Party In Progress" },
+    fr: { title: "Fête en cours" },
   },
 ];

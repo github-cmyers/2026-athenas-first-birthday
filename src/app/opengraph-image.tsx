@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 import { OWL_COLORS, PartyOwl, Snowflake } from "./components/decor";
-import { formatEventDate, formatEventTime, partyDate } from "@/lib/event";
+import { formatEventDate, formatEventTimeRange, PARTY_END, partyDate } from "@/lib/event";
 
 // The image shown when the site's link is shared in iMessage, WhatsApp,
 // Facebook and the like. Next turns this file into /opengraph-image and adds
@@ -78,7 +78,7 @@ function Garland() {
 export default async function OpengraphImage() {
   const title = "Athena's First Birthday";
   const lead = "Look whooo's turning";
-  const when = `${formatEventDate(partyDate)} · ${formatEventTime(partyDate)}`;
+  const when = `${formatEventDate(partyDate)} · ${formatEventTimeRange(partyDate, PARTY_END)}`;
   const chip = "YOU'RE INVITED!";
 
   const [semibold, bold] = await Promise.all([

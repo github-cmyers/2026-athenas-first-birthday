@@ -23,10 +23,11 @@ const FORECAST_RANGE_DAYS = 14;
 //
 // Recompute with scripts/snow-history.mjs if the date or the venue's town
 // changes.
+// Computed for Lincoln, RI (41.92, -71.44).
 export const SNOW_HISTORY = {
   years: 30,
   lastYear: 2025,
-  chancePercent: 14,
+  chancePercent: 15,
   typicalHigh: 40,
   typicalLow: 27,
 };

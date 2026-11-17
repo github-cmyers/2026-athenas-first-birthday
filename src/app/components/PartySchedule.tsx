@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { SectionHeading } from "./decor";
-import { formatEventTime, PARTY_DURATION_HOURS, PARTY_SCHEDULE } from "@/lib/event";
+import { formatEventTimeRange, PARTY_DURATION_HOURS, PARTY_SCHEDULE } from "@/lib/event";
 import { getMessages, type Lang } from "@/lib/i18n";
 
 // The day's plan, shown on party day, with whatever is happening right now
@@ -27,9 +27,11 @@ export default function PartySchedule({
 
   const start = new Date(startIso).getTime();
   const end = start + PARTY_DURATION_HOURS * 60 * 60 * 1000;
-  const items = PARTY_SCHEDULE.map((item) => ({
+  // Each item runs until the next one starts; the last until the party ends.
+  const items = PARTY_SCHEDULE.map((item, i) => ({
     ...item[lang],
     at: start + item.minutes * 60 * 1000,
+    until: i + 1 < PARTY_SCHEDULE.length ? start + PARTY_SCHEDULE[i + 1].minutes * 60 * 1000 : end,
   }));
 
   // The latest item that has started, as long as the party is on.
@@ -52,17 +54,19 @@ export default function PartySchedule({
             <li
               key={item.at}
               aria-current={isCurrent ? "step" : undefined}
-              className={`flex gap-4 rounded-2xl border-[2.5px] p-4 transition-colors ${
+              className={`flex flex-col gap-1 rounded-2xl border-[2.5px] p-4 transition-colors sm:flex-row sm:gap-4 ${
                 isCurrent
                   ? "border-ink bg-glacier/35 shadow-[3px_3px_0_0_var(--color-ink)]"
                   : "border-ink/15"
               } ${isPast ? "opacity-55" : ""}`}
             >
+              {/* On phones the time sits above the title, so a range like
+                  "3:00 – 8:00 PM" never squeezes it. */}
               <time
                 dateTime={new Date(item.at).toISOString()}
-                className="w-20 shrink-0 pt-0.5 font-display text-lg font-semibold tabular-nums text-ink md:w-24"
+                className="shrink-0 whitespace-nowrap pt-0.5 font-display text-lg font-semibold tabular-nums text-ink sm:w-40"
               >
-                {formatEventTime(new Date(item.at), lang)}
+                {formatEventTimeRange(new Date(item.at), new Date(item.until), lang)}
               </time>
               <div>
                 <div className="flex flex-wrap items-center gap-2 font-display text-xl font-semibold text-ink">

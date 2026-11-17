@@ -8,9 +8,9 @@ Built with Next.js (App Router), React, Tailwind CSS and PostgreSQL. It started 
 
 These still need real details or a final check:
 
-- [ ] **Start time.** 4:00 PM is a placeholder. Set it in `partyDate` in [src/lib/event.ts](src/lib/event.ts).
-- [ ] **Venue.** Still the naming ceremony's venue. Set `VENUE` in [src/lib/event.ts](src/lib/event.ts), including the town's coordinates, which drive the weather forecast.
-- [ ] **Day-of schedule.** `PARTY_SCHEDULE` in [src/lib/event.ts](src/lib/event.ts) is a draft. Replace it with the real plan, in English and French.
+- [x] **Time.** 3:00 PM to 8:00 PM (`partyDate` and `PARTY_DURATION_HOURS` in [src/lib/event.ts](src/lib/event.ts)).
+- [x] **Venue.** 171 Jenckes Hill Rd, Lincoln, RI 02865 (`VENUE` in [src/lib/event.ts](src/lib/event.ts)).
+- [x] **Day-of schedule.** A single "Party In Progress" entry for 3:00 – 8:00 PM, highlighted while the party is on. Add items to `PARTY_SCHEDULE` in [src/lib/event.ts](src/lib/event.ts) if you want a fuller plan.
 - [ ] **Prediction questions.** The four questions and their answers in [src/lib/predictions.ts](src/lib/predictions.ts) are a first draft. Settle them before RSVPs start coming in (see [Predictions for Athena](#predictions-for-athena)).
 - [ ] **French wording.** Have a fluent speaker read the French in [src/lib/i18n.ts](src/lib/i18n.ts) and [src/lib/predictions.ts](src/lib/predictions.ts).
 - [x] **Production settings.** `SITE_URL` and `ADMIN_PASSWORD` are set on Railway (see [Production](#production-railway)).
@@ -50,7 +50,7 @@ Almost everything about the party lives in one file, [src/lib/event.ts](src/lib/
 | Host contact | `HOST` | Shown in the "Questions?" section. |
 | RSVPs open/closed | `RSVP_OPEN` | RSVPs close by themselves when the party starts. Set this to `false` to close them early. |
 | Most people per RSVP | `MAX_FAMILY_MEMBERS` | Used by both the form and the server. |
-| Day-of schedule | `PARTY_SCHEDULE` | Each item gives minutes after the start, plus English and French text, so the times move with `partyDate`. |
+| Day-of schedule | `PARTY_SCHEDULE` | Each item gives minutes after the start, plus English and French text, so the times move with `partyDate`. An item runs until the next one starts, and the last until the party ends. It's currently one "Party In Progress" entry for the whole party. |
 
 Other things you might change:
 
@@ -67,7 +67,7 @@ The phase comes from the clock in Eastern time:
 | Phase | When | What guests see |
 | --- | --- | --- |
 | Upcoming | Until the day of the party | The invitation, countdown, details with the weather, and the RSVP form. |
-| Party day | From midnight on December 19 until the party ends | "Today's the day!" and the day's schedule at the top, with the current item highlighted. Everyone's predictions are revealed. RSVPs close at the start time. |
+| Party day | From midnight on December 19 until the party ends | "Today's the day!" and the day's schedule at the top: "Party In Progress, 3:00 – 8:00 PM", marked "Happening now" while the party is on. Everyone's predictions are revealed. RSVPs close at the start time. |
 | After | Once the party is over | A thank-you note replaces the invitation, and the predictions stay up. The countdown, details and RSVP section are hidden. |
 
 To see a phase early, add `?preview=party-day` or `?preview=after` to the address, e.g. `/?preview=after&lang=fr`. Previews only change what's displayed: RSVPs still open and close by the real clock.
@@ -97,13 +97,13 @@ When an RSVP goes through, a pop-up asks four questions, such as "When she grows
 
 The weather tile in "Where & when" is always shown until the party is over. Its data comes from [Open-Meteo](https://open-meteo.com/), which is free and needs no account. The site credits it under the tile, as its licence requires.
 
-- **More than 2 weeks out: "Snow Prediction".** The odds of snow and the typical high and low, from 30 years of weather history around the date in the venue's town. For December 19 in North Providence, that's about a 1 in 7 chance of snow, with a typical high of 40°F and low of 27°F.
+- **More than 2 weeks out: "Snow Prediction".** The odds of snow and the typical high and low, from 30 years of weather history around the date in the venue's town. For December 19 in Lincoln, that's about a 1 in 7 chance of snow (15%), with a typical high of 40°F and low of 27°F.
 - **The last 2 weeks: "Party-day forecast".** The live forecast. Results are reused for an hour, so guests' visits don't each call the service. If the service is slow (over 4 seconds) or down, the tile shows the snow prediction instead. The rest of the page never waits for it.
 
 The snow prediction's numbers are stored in `SNOW_HISTORY` in [src/lib/forecast.ts](src/lib/forecast.ts), because Open-Meteo's history service takes a minute or more to answer. If the party date or the venue's town changes, recompute them and paste the output over the old values:
 
 ```bash
-node scripts/snow-history.mjs 41.85 -71.47 12-19   # latitude, longitude, month-day
+node scripts/snow-history.mjs 41.92 -71.44 12-19   # latitude, longitude, month-day
 ```
 
 ## Printable invitation

@@ -1,7 +1,7 @@
 import { Balloon, Bunting, Snowfall } from "./decor";
 import LanguageToggle from "./LanguageToggle";
 import TappableOwl from "./TappableOwl";
-import { formatEventDate, formatEventTime, partyDate, type PartyPhase } from "@/lib/event";
+import { formatEventDate, formatEventTimeRange, PARTY_END, partyDate, type PartyPhase } from "@/lib/event";
 import { getMessages, type Lang } from "@/lib/i18n";
 
 // Each letter of the giant "ONE!" gets its own colour and resting tilt; the
@@ -24,7 +24,7 @@ export default function Hero({
 }) {
   const t = getMessages(lang).hero;
   const date = formatEventDate(partyDate, lang);
-  const time = formatEventTime(partyDate, lang);
+  const time = formatEventTimeRange(partyDate, PARTY_END, lang);
 
   return (
     <header className="relative overflow-hidden pb-10 md:pb-14">

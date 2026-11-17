@@ -3,7 +3,7 @@
 // date or the venue's town changes, and paste the output over the old values.
 //
 // Usage: node scripts/snow-history.mjs <latitude> <longitude> <MM-DD> [lastYear]
-//   e.g. node scripts/snow-history.mjs 41.85 -71.47 12-19 2025
+//   e.g. node scripts/snow-history.mjs 41.92 -71.44 12-19 2025
 //
 // Data: Open-Meteo's historical archive (ERA5 reanalysis), free and keyless.
 // The archive is slow for long date ranges, so this asks for one short window
