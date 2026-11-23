@@ -10,7 +10,6 @@ import { getMessages, type Lang } from "@/lib/i18n";
 interface PartyDetailsProps {
   lang: Lang;
   address: string;
-  venueName?: string;
   startDate: Date;
   durationHours?: number;
   // The weather tile, passed in so it can load on its own without holding up
@@ -50,7 +49,6 @@ function InfoTile({
 export default function PartyDetails({
   lang,
   address,
-  venueName,
   startDate,
   durationHours = PARTY_DURATION_HOURS,
   forecast,
@@ -102,14 +100,7 @@ export default function PartyDetails({
           />
         </div>
 
-        {venueName && (
-          <div className="mt-8 text-center">
-            <h3 className="font-display text-2xl font-medium text-ink">{t.hostingAt(venueName)}</h3>
-            <p className="mt-1 text-base text-ink/75">{address}</p>
-          </div>
-        )}
-
-        <div className={`${venueName ? "mt-4" : "mt-6"} overflow-hidden rounded-2xl border-[3px] border-ink`}>
+        <div className="mt-6 overflow-hidden rounded-2xl border-[3px] border-ink">
           <iframe
             src={mapsEmbedUrl}
             width="100%"

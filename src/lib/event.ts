@@ -47,7 +47,6 @@ export const HOST = {
 // are close enough - a forecast grid cell is several miles across. If the
 // town changes, update them and recompute SNOW_HISTORY in forecast.ts.
 export const VENUE = {
-  name: "Knights of Columbus",
   address: "171 Jenckes Hill Rd, Lincoln, RI 02865",
   latitude: 41.92, // Lincoln, RI
   longitude: -71.44,
