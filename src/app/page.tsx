@@ -86,6 +86,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
             <PartyDetails
               lang={lang}
               address={VENUE.address}
+              venueName={VENUE.name}
               startDate={partyDate}
               forecast={
                 // Streams in separately so a slow weather service never holds
